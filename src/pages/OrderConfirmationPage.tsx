@@ -7,7 +7,7 @@ import type { Order } from '../types'
 export const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate()
   const { cart, clearCart } = useCart()
-  const { customer } = useCustomer()
+  const { customer, location } = useCustomer()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -41,12 +41,21 @@ export const OrderConfirmationPage: React.FC = () => {
     setError(null)
 
     try {
+      const subtotal = calculateTotal()
+      const tax = 0 // No tax for now
+      const tip = 0 // No tip for now
+      const total = subtotal + tax + tip
+
       const orderData = {
-        customerId: customer.id,
-        customerName: customer.name,
         customerPhone: customer.phoneNumber,
-        items: cart.items,
-        total: calculateTotal()
+        customerName: customer.name,
+        location: location?.address || '',
+        address: location?.address || '',
+        subtotal: subtotal,
+        tax: tax,
+        tip: tip,
+        total: total,
+        items: cart.items
       }
 
       const response = await fetch('/api/orders', {
