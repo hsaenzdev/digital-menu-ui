@@ -104,8 +104,63 @@ export const OrderConfirmationPage: React.FC = () => {
     )
   }
 
-  // If missing data, show appropriate message
-  if (!hasCartItems || !hasCustomerInfo) {
+  // If order has been submitted, show confirmation
+  if (submittedOrder) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 p-2 sm:p-4">
+        <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
+          <div className="text-center mb-6">
+            <div className="text-6xl mb-4">✅</div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+            <p className="text-xl text-green-600 font-semibold">Order #{submittedOrder.orderNumber}</p>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-green-900 mb-2">🎉 Thank you for your order!</h3>
+            <p className="text-green-800">Your order has been successfully submitted and we've sent you a WhatsApp confirmation.</p>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 className="font-semibold text-gray-900 mb-4">Order Details:</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Customer:</span>
+                <span className="font-medium text-gray-900">{submittedOrder.customerName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium text-gray-900">{submittedOrder.customerPhone}</span>
+              </div>
+              <div className="flex justify-between border-t border-gray-300 pt-3">
+                <span className="text-gray-600 font-medium">Total:</span>
+                <span className="font-bold text-green-600 text-lg">${submittedOrder.total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2 text-blue-800">
+              <span>📱</span>
+              <span className="text-sm">You'll receive WhatsApp updates about your order status</span>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">Redirecting to order status page...</p>
+            <button 
+              className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              onClick={() => navigate(`/order-status/${submittedOrder.id}`)}
+            >
+              View Order Status
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // If missing data, show appropriate message (but not if order was just submitted or is being submitted)
+  if ((!hasCartItems || !hasCustomerInfo) && !isSubmitting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
         <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
