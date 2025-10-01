@@ -131,13 +131,13 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-900">{item.name}</h2>
           <button className="text-gray-400 hover:text-gray-600 text-2xl leading-none" onClick={onClose}>×</button>
         </div>
 
-        <div className="p-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="p-4 overflow-y-auto flex-1">
           {item.description && (
             <p className="text-gray-600 mb-4">{item.description}</p>
           )}
@@ -255,7 +255,7 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
           </div>
         </div>
 
-        <div className="flex space-x-3 p-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex space-x-3 p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
           <button 
             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors" 
             onClick={onClose}
