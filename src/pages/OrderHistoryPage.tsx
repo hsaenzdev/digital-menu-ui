@@ -28,8 +28,7 @@ export const OrderHistoryPage: React.FC = () => {
           setError(data.error || 'Failed to load orders')
         }
       } catch (err) {
-        console.error('Error fetching orders:', err)
-        setError('Failed to load order history')
+        setError(err instanceof Error ? err.message : 'Failed to load orders')
       } finally {
         setLoading(false)
       }
@@ -60,42 +59,38 @@ export const OrderHistoryPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return '#ffc107'
+        return 'text-yellow-600 bg-yellow-50'
       case 'confirmed':
-        return '#17a2b8'
+        return 'text-blue-600 bg-blue-50'
       case 'preparing':
-        return '#fd7e14'
+        return 'text-orange-600 bg-orange-50'
       case 'ready':
-        return '#28a745'
+        return 'text-green-600 bg-green-50'
       case 'delivered':
-        return '#6f42c1'
+        return 'text-purple-600 bg-purple-50'
       case 'cancelled':
-        return '#dc3545'
+        return 'text-red-600 bg-red-50'
       default:
-        return '#6c757d'
+        return 'text-gray-600 bg-gray-50'
     }
-  }
-
-  const isActiveOrder = (status: string) => {
-    return ['pending', 'confirmed', 'preparing', 'ready'].includes(status)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
-        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
-          <div className="mb-6">
-            <button 
-              className="flex items-center text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors" 
-              onClick={() => navigate('/menu')}
-            >
-              ← Back
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">📋 Order History</h1>
+      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
+        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center">📋 Order History</h1>
+            <p className="text-purple-100 text-xs sm:text-sm md:text-base text-center">Loading your orders...</p>
           </div>
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-6xl mb-4 animate-pulse">⏳</div>
-            <p className="text-gray-600 text-lg">Loading your orders...</p>
+          
+          {/* Loading Content */}
+          <div className="p-4 sm:p-6">
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4 animate-pulse">⏳</div>
+              <p className="text-gray-600">Loading your order history...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -104,190 +99,170 @@ export const OrderHistoryPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
-        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
-          <div className="mb-6">
-            <button 
-              className="flex items-center text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors" 
-              onClick={() => navigate('/menu')}
-            >
-              ← Back
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">📋 Order History</h1>
+      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
+        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center">📋 Order History</h1>
+            <p className="text-purple-100 text-xs sm:text-sm md:text-base text-center">Error loading orders</p>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <div className="text-6xl mb-4">❌</div>
-            <h3 className="text-lg font-semibold text-red-900 mb-2">Error Loading Orders</h3>
-            <p className="text-red-700 mb-4">{error}</p>
-            <button 
-              className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
-              onClick={() => window.location.reload()}
-            >
-              Retry
-            </button>
+          
+          {/* Error Content */}
+          <div className="p-4 sm:p-6">
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">❌</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Failed to Load Orders</h3>
+              <p className="text-gray-600 mb-6">{error}</p>
+              <button 
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-8 rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-card hover:shadow-card-hover"
+                onClick={() => navigate('/menu')}
+              >
+                Browse Menu
+              </button>
+            </div>
           </div>
         </div>
       </div>
     )
   }
 
-  const activeOrders = orders.filter(order => isActiveOrder(order.status))
-  const completedOrders = orders.filter(order => !isActiveOrder(order.status))
-
-  const OrderCard: React.FC<{ order: Order; isActive?: boolean }> = ({ order, isActive = false }) => (
-    <div className={`bg-white border-2 rounded-lg p-6 shadow-lg ${isActive ? 'border-orange-200' : 'border-gray-200'}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 font-medium">Order #</span>
-          <span className="text-lg font-bold text-gray-900">{order.orderNumber}</span>
-        </div>
-        <div 
-          className="px-3 py-1 rounded-full text-white text-sm font-bold"
-          style={{ backgroundColor: getStatusColor(order.status) }}
-        >
-          {getStatusIcon(order.status)} {order.status.toUpperCase()}
-        </div>
-      </div>
-
-      <div className="space-y-3 mb-4">
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>📅</span>
-            <span>Date:</span>
-          </span>
-          <span className="text-gray-900 font-medium">{new Date(order.createdAt).toLocaleString()}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>🍽️</span>
-            <span>Items:</span>
-          </span>
-          <span className="text-gray-900 font-medium">{order.items.length} item{order.items.length > 1 ? 's' : ''}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>💰</span>
-            <span>Total:</span>
-          </span>
-          <span className="text-xl font-bold text-green-600">${order.total.toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-200 pt-4 mb-4">
-        <div className="space-y-2">
-          {order.items.slice(0, isActive ? 3 : 2).map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between text-sm">
-              <span className="text-gray-700">{item.itemName}</span>
-              <span className="text-gray-500 font-medium">x{item.quantity}</span>
-            </div>
-          ))}
-          {order.items.length > (isActive ? 3 : 2) && (
-            <div className="text-sm text-gray-500 italic">
-              +{order.items.length - (isActive ? 3 : 2)} more item{order.items.length - (isActive ? 3 : 2) > 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <button 
-        className={`w-full py-3 rounded-lg font-medium transition-colors ${
-          isActive 
-            ? 'bg-orange-600 text-white hover:bg-orange-700' 
-            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-        }`}
-        onClick={() => navigate(`/order-status/${order.id}`)}
-      >
-        View Details {isActive ? '→' : ''}
-      </button>
-    </div>
-  )
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
-      <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 pb-20">
-        <div className="mb-6">
-          <button 
-            className="flex items-center text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors" 
-            onClick={() => navigate('/menu')}
-          >
-            ← Back
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">📋 Your Orders</h1>
-          <p className="text-gray-600">Track your current and past orders</p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Active Orders Warning */}
-          {activeOrders.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start space-x-3">
-              <div className="text-2xl">⚠️</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-amber-900 mb-1">Active Orders in Progress</h3>
-                <p className="text-amber-800 text-sm">
-                  You have {activeOrders.length} active order{activeOrders.length > 1 ? 's' : ''}. 
-                  Please wait for {activeOrders.length > 1 ? 'them' : 'it'} to be completed before placing a new order.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* No Orders */}
-          {orders.length === 0 && (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🍽️</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Orders Yet</h3>
-              <p className="text-gray-600 mb-6">You haven't placed any orders. Start browsing our menu!</p>
-              <button 
-                className="bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
-                onClick={() => navigate('/menu')}
-              >
-                Browse Menu
-              </button>
-            </div>
-          )}
-
-          {/* Active Orders Section */}
-          {activeOrders.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                <span>🔥</span>
-                <span>Active Orders</span>
-              </h2>
-              <div className="space-y-4">
-                {activeOrders.map(order => (
-                  <OrderCard key={order.id} order={order} isActive={true} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Completed Orders Section */}
-          {completedOrders.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                <span>✅</span>
-                <span>Order History</span>
-              </h2>
-              <div className="space-y-4">
-                {completedOrders.map(order => (
-                  <OrderCard key={order.id} order={order} isActive={false} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Button */}
-        {activeOrders.length === 0 && orders.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
+      <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden relative">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex items-center justify-between">
             <button 
-              className="bg-primary-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:bg-primary-700 transition-colors"
+              className="text-white hover:text-purple-100 font-medium flex items-center gap-1 sm:gap-2 transition-colors text-sm sm:text-base"
               onClick={() => navigate('/menu')}
             >
-              Place New Order
+              ← <span className="hidden xs:inline">Back</span>
             </button>
+            <div className="text-center flex-1 px-2">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-bold">📋 Order History</h1>
+              <p className="text-purple-100 text-xs sm:text-sm md:text-base">Your past orders</p>
+            </div>
+            <div className="w-8"></div> {/* Spacer for centering */}
           </div>
-        )}
+
+          {/* Customer Summary */}
+          {customer && (
+            <div className="flex flex-col xs:flex-row gap-1 xs:gap-3 text-xs sm:text-sm text-purple-100 mt-3 pt-3 border-t border-purple-400">
+              <span className="flex items-center gap-1 truncate">
+                👤 <span className="truncate">{customer.name}</span>
+              </span>
+              <span className="flex items-center gap-1 truncate">
+                📞 <span className="truncate">{customer.phoneNumber}</span>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="h-[calc(100vh-16rem)] overflow-y-auto">
+          <div className="p-4 sm:p-6 pb-24 space-y-6"> {/* Bottom padding for sticky button */}
+
+            {orders.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-7xl mb-4">📋</div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
+                <p className="text-gray-600 mb-6">You haven't placed any orders. Start browsing our menu!</p>
+                <button 
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold px-8 py-3 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all"
+                  onClick={() => navigate('/menu')}
+                >
+                  Browse Menu
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">Your Orders ({orders.length})</h2>
+                
+                {orders.map((order) => (
+                  <div key={order.id} className="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-bold text-gray-900">Order #{order.orderNumber}</h3>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
+                            {getStatusIcon(order.status)} {order.status}
+                          </span>
+                        </div>
+                        
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
+                          <div>📍 {order.location}</div>
+                          <div>💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
+                        </div>
+                      </div>
+                      
+                      <button 
+                        className="ml-4 bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                        onClick={() => navigate(`/order-status/${order.id}`)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                    
+                    {/* Order Items Preview */}
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-900 mb-2">Items:</h4>
+                      <div className="space-y-2">
+                        {order.items.slice(0, 3).map((item, index) => (
+                          <div key={index} className="flex justify-between text-sm">
+                            <span className="text-gray-700">
+                              {item.quantity}x {item.itemName}
+                            </span>
+                            <span className="text-gray-900 font-medium">
+                              ${item.totalPrice.toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                        {order.items.length > 3 && (
+                          <div className="text-sm text-gray-500 italic">
+                            +{order.items.length - 3} more item{order.items.length - 3 !== 1 ? 's' : ''}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Quick Actions */}
+                    <div className="flex gap-2 mt-4">
+                      <button 
+                        className="flex-1 bg-white text-purple-600 border border-purple-600 text-sm px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors"
+                        onClick={() => navigate(`/order-status/${order.id}`)}
+                      >
+                        📋 View Status
+                      </button>
+                      
+                      {order.status === 'delivered' && (
+                        <button 
+                          className="flex-1 bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                          onClick={() => {
+                            // TODO: Implement reorder functionality
+                            navigate('/menu')
+                          }}
+                        >
+                          🔄 Reorder
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fixed Action Button */}
+        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-4 rounded-b-3xl">
+          <button 
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+            onClick={() => navigate('/menu')}
+          >
+            Browse Menu
+          </button>
+        </div>
       </div>
     </div>
   )

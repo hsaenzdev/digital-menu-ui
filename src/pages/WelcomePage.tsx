@@ -73,7 +73,7 @@ export const WelcomePage: React.FC = () => {
       <div className="bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 w-full sm:max-w-2xl animate-fade-in">
         {/* Restaurant Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
             🍽️ Digital Menu
           </h1>
           <p className="text-gray-600 text-base sm:text-lg">Delicious food delivered to your door</p>
@@ -116,7 +116,7 @@ export const WelcomePage: React.FC = () => {
 
           {/* Start Order Button */}
           <button 
-            className="w-full bg-gradient-primary text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200"
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200"
             onClick={handleStartOrder}
           >
             Start Your Order
