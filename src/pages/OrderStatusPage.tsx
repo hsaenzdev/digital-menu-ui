@@ -81,32 +81,51 @@ export const OrderStatusPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return '#ffc107'
+        return 'text-yellow-600 bg-yellow-100'
       case 'confirmed':
-        return '#17a2b8'
+        return 'text-blue-600 bg-blue-100'
       case 'preparing':
-        return '#fd7e14'
+        return 'text-orange-600 bg-orange-100'
       case 'ready':
-        return '#28a745'
+        return 'text-green-600 bg-green-100'
       case 'delivered':
-        return '#6f42c1'
+        return 'text-purple-600 bg-purple-100'
       case 'cancelled':
-        return '#dc3545'
+        return 'text-red-600 bg-red-100'
       default:
-        return '#6c757d'
+        return 'text-gray-600 bg-gray-100'
+    }
+  }
+
+  const getStatusRingColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'ring-yellow-500'
+      case 'confirmed':
+        return 'ring-blue-500'
+      case 'preparing':
+        return 'ring-orange-500'
+      case 'ready':
+        return 'ring-green-500'
+      case 'delivered':
+        return 'ring-purple-500'
+      case 'cancelled':
+        return 'ring-red-500'
+      default:
+        return 'ring-gray-500'
     }
   }
 
   if (loading) {
     return (
-      <div className="order-status-page">
-        <div className="status-header">
-          <h1>📋 Order Status</h1>
-        </div>
-        <div className="status-content">
-          <div className="loading-card">
-            <div className="loading-icon">⏳</div>
-            <p>Loading your order details...</p>
+      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
+        <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">📋 Order Status</h1>
+          </div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="text-6xl mb-4 animate-pulse">⏳</div>
+            <p className="text-gray-600 text-lg">Loading your order details...</p>
           </div>
         </div>
       </div>
@@ -115,17 +134,17 @@ export const OrderStatusPage: React.FC = () => {
 
   if (error || !order) {
     return (
-      <div className="order-status-page">
-        <div className="status-header">
-          <h1>📋 Order Status</h1>
-        </div>
-        <div className="status-content">
-          <div className="error-card">
-            <div className="error-icon">❌</div>
-            <h3>Order Not Found</h3>
-            <p>{error || 'Could not find your order'}</p>
+      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
+        <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">📋 Order Status</h1>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div className="text-6xl mb-4">❌</div>
+            <h3 className="text-lg font-semibold text-red-900 mb-2">Order Not Found</h3>
+            <p className="text-red-700 mb-4">{error || 'Could not find your order'}</p>
             <button 
-              className="back-home-btn"
+              className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
               onClick={() => navigate('/welcome')}
             >
               Return Home
@@ -136,97 +155,106 @@ export const OrderStatusPage: React.FC = () => {
     )
   }
 
-  return (
-    <div className="order-status-page">
-      <div className="status-header">
-        <h1>📋 Order Status</h1>
-        <p>Order #{order.orderNumber}</p>
-      </div>
+  const stepCompleted = (stepStatus: string) => {
+    const orderIndex = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'].indexOf(order.status)
+    const stepIndex = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'].indexOf(stepStatus)
+    return stepIndex <= orderIndex
+  }
 
-      <div className="status-content">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
+      <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 space-y-6">
+        
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">📋 Order Status</h1>
+          <p className="text-gray-600">Order #{order.orderNumber}</p>
+        </div>
+
         {/* Current Status */}
-        <div className="current-status-card">
-          <div 
-            className="status-icon"
-            style={{ color: getStatusColor(order.status) }}
-          >
+        <div className={`${getStatusColor(order.status)} rounded-xl p-6 text-center ring-4 ${getStatusRingColor(order.status)}`}>
+          <div className="text-6xl mb-4">
             {getStatusIcon(order.status)}
           </div>
-          <h2 style={{ color: getStatusColor(order.status) }}>
+          <h2 className="text-2xl font-bold mb-2">
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
           </h2>
-          <p className="status-message">
+          <p className="text-lg mb-4">
             {getStatusMessage(order.status)}
           </p>
-          <p className="order-time">
+          <p className="text-sm opacity-75">
             Order placed: {new Date(order.createdAt).toLocaleString()}
           </p>
         </div>
 
         {/* Progress Steps */}
-        <div className="progress-steps">
-          <div className={`step ${['pending', 'confirmed', 'preparing', 'ready', 'delivered'].includes(order.status) ? 'completed' : ''}`}>
-            <div className="step-icon">⏳</div>
-            <span>Order Received</span>
-          </div>
-          <div className={`step ${['confirmed', 'preparing', 'ready', 'delivered'].includes(order.status) ? 'completed' : ''}`}>
-            <div className="step-icon">✅</div>
-            <span>Confirmed</span>
-          </div>
-          <div className={`step ${['preparing', 'ready', 'delivered'].includes(order.status) ? 'completed' : ''}`}>
-            <div className="step-icon">👨‍🍳</div>
-            <span>Preparing</span>
-          </div>
-          <div className={`step ${['ready', 'delivered'].includes(order.status) ? 'completed' : ''}`}>
-            <div className="step-icon">🔔</div>
-            <span>Ready</span>
-          </div>
-          <div className={`step ${order.status === 'delivered' ? 'completed' : ''}`}>
-            <div className="step-icon">🎉</div>
-            <span>Delivered</span>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Order Progress</h3>
+          <div className="space-y-4">
+            {[
+              { status: 'pending', icon: '⏳', label: 'Order Received' },
+              { status: 'confirmed', icon: '✅', label: 'Confirmed' },
+              { status: 'preparing', icon: '👨‍🍳', label: 'Preparing' },
+              { status: 'ready', icon: '🔔', label: 'Ready' },
+              { status: 'delivered', icon: '🎉', label: 'Delivered' }
+            ].map((step) => (
+              <div key={step.status} className={`flex items-center space-x-3 ${stepCompleted(step.status) ? 'opacity-100' : 'opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg ${stepCompleted(step.status) ? 'bg-green-100' : 'bg-gray-200'}`}>
+                  {stepCompleted(step.status) ? '✓' : step.icon}
+                </div>
+                <span className={`font-medium ${stepCompleted(step.status) ? 'text-green-800' : 'text-gray-500'}`}>
+                  {step.label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Order Details */}
-        <div className="order-details-card">
-          <h3>📋 Order Details</h3>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="font-semibold text-gray-900 mb-4">📋 Order Details</h3>
           
-          <div className="order-info">
-            <div className="info-row">
-              <span>Customer:</span>
-              <span>{order.customerName}</span>
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Customer:</span>
+              <span className="font-medium text-gray-900">{order.customerName}</span>
             </div>
-            <div className="info-row">
-              <span>Phone:</span>
-              <span>{order.customerPhone}</span>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Phone:</span>
+              <span className="font-medium text-gray-900">{order.customerPhone}</span>
             </div>
             {order.address && (
-              <div className="info-row">
-                <span>Address:</span>
-                <span>{order.address}</span>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Address:</span>
+                <span className="font-medium text-gray-900 text-right">{order.address}</span>
               </div>
             )}
-            <div className="info-row">
-              <span>Total:</span>
-              <span>${order.total.toFixed(2)}</span>
+            <div className="flex justify-between border-t border-gray-300 pt-3">
+              <span className="text-gray-600 font-medium">Total:</span>
+              <span className="font-bold text-green-600 text-lg">${order.total.toFixed(2)}</span>
             </div>
           </div>
 
-          <div className="order-items">
-            <h4>Items:</h4>
-            {order.items.map((item, index) => (
-              <div key={index} className="status-item">
-                <div className="item-info">
-                  <span className="item-name">{item.itemName}</span>
-                  <span className="item-quantity">x{item.quantity}</span>
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Items:</h4>
+            <div className="space-y-4">
+              {order.items.map((item, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-medium text-gray-900">{item.itemName}</span>
+                    <div className="text-right">
+                      <span className="text-sm text-gray-500">x{item.quantity}</span>
+                      <div className="font-bold text-gray-900">${item.totalPrice.toFixed(2)}</div>
+                    </div>
+                  </div>
                   
                   {item.selectedModifiers && item.selectedModifiers.length > 0 && (
-                    <div className="item-modifiers">
+                    <div className="mt-2 space-y-1">
                       {item.selectedModifiers.map((modifier, idx) => (
-                        <div key={idx} className="modifier">
-                          <span className="modifier-name">{modifier.modifierName}:</span>
+                        <div key={idx} className="text-sm text-gray-600">
+                          <span className="font-medium">{modifier.modifierName}:</span>
                           {modifier.selectedOptions.map((option, optIdx) => (
-                            <span key={optIdx} className="modifier-option">
+                            <span key={optIdx} className="ml-1">
                               {option.optionName} (+${option.price.toFixed(2)})
                             </span>
                           ))}
@@ -236,41 +264,47 @@ export const OrderStatusPage: React.FC = () => {
                   )}
                   
                   {item.specialNotes && (
-                    <div className="item-notes">
-                      <span className="notes-label">📝</span>
-                      <span className="notes-text">{item.specialNotes}</span>
+                    <div className="mt-2 text-sm text-gray-600 bg-yellow-50 p-2 rounded border-l-4 border-yellow-400">
+                      <span className="font-medium">📝 Special Notes:</span>
+                      <span className="ml-1">{item.specialNotes}</span>
                     </div>
                   )}
                 </div>
-                <span className="item-price">${item.totalPrice.toFixed(2)}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Contact Information */}
-        <div className="contact-card">
-          <h3>📞 Need Help?</h3>
-          <p>If you have any questions about your order, please contact us:</p>
-          <div className="contact-info">
-            <div>📱 WhatsApp: You'll receive updates automatically</div>
-            <div>🕒 Estimated time: 15-25 minutes</div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="font-semibold text-blue-900 mb-2">📞 Need Help?</h3>
+          <p className="text-blue-800 mb-3">If you have any questions about your order, please contact us:</p>
+          <div className="space-y-2 text-sm text-blue-700">
+            <div className="flex items-center space-x-2">
+              <span>📱</span>
+              <span>WhatsApp: You'll receive updates automatically</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>🕒</span>
+              <span>Estimated time: 15-25 minutes</span>
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="status-actions">
+        <div className="flex space-x-3">
           <button 
-            className="refresh-btn"
+            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
             onClick={() => window.location.reload()}
           >
-            🔄 Refresh Status
+            <span>🔄</span>
+            <span>Refresh Status</span>
           </button>
           <button 
-            className="new-order-btn"
-            onClick={() => navigate('/welcome')}
+            className="flex-1 bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+            onClick={() => navigate('/orders')}
           >
-            Place New Order
+            View All Orders
           </button>
         </div>
       </div>

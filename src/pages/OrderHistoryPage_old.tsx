@@ -134,77 +134,9 @@ export const OrderHistoryPage: React.FC = () => {
   const activeOrders = orders.filter(order => isActiveOrder(order.status))
   const completedOrders = orders.filter(order => !isActiveOrder(order.status))
 
-  const OrderCard: React.FC<{ order: Order; isActive?: boolean }> = ({ order, isActive = false }) => (
-    <div className={`bg-white border-2 rounded-lg p-6 shadow-lg ${isActive ? 'border-orange-200' : 'border-gray-200'}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 font-medium">Order #</span>
-          <span className="text-lg font-bold text-gray-900">{order.orderNumber}</span>
-        </div>
-        <div 
-          className="px-3 py-1 rounded-full text-white text-sm font-bold"
-          style={{ backgroundColor: getStatusColor(order.status) }}
-        >
-          {getStatusIcon(order.status)} {order.status.toUpperCase()}
-        </div>
-      </div>
-
-      <div className="space-y-3 mb-4">
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>📅</span>
-            <span>Date:</span>
-          </span>
-          <span className="text-gray-900 font-medium">{new Date(order.createdAt).toLocaleString()}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>🍽️</span>
-            <span>Items:</span>
-          </span>
-          <span className="text-gray-900 font-medium">{order.items.length} item{order.items.length > 1 ? 's' : ''}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600 flex items-center space-x-1">
-            <span>💰</span>
-            <span>Total:</span>
-          </span>
-          <span className="text-xl font-bold text-green-600">${order.total.toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-200 pt-4 mb-4">
-        <div className="space-y-2">
-          {order.items.slice(0, isActive ? 3 : 2).map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between text-sm">
-              <span className="text-gray-700">{item.itemName}</span>
-              <span className="text-gray-500 font-medium">x{item.quantity}</span>
-            </div>
-          ))}
-          {order.items.length > (isActive ? 3 : 2) && (
-            <div className="text-sm text-gray-500 italic">
-              +{order.items.length - (isActive ? 3 : 2)} more item{order.items.length - (isActive ? 3 : 2) > 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <button 
-        className={`w-full py-3 rounded-lg font-medium transition-colors ${
-          isActive 
-            ? 'bg-orange-600 text-white hover:bg-orange-700' 
-            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-        }`}
-        onClick={() => navigate(`/order-status/${order.id}`)}
-      >
-        View Details {isActive ? '→' : ''}
-      </button>
-    </div>
-  )
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
-      <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 pb-20">
+      <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
         <div className="mb-6">
           <button 
             className="flex items-center text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors" 
@@ -254,39 +186,142 @@ export const OrderHistoryPage: React.FC = () => {
                 <span>Active Orders</span>
               </h2>
               <div className="space-y-4">
-                {activeOrders.map(order => (
-                  <OrderCard key={order.id} order={order} isActive={true} />
-                ))}
-              </div>
-            </div>
-          )}
+              {activeOrders.map(order => (
+                <div key={order.id} className="bg-white border-2 border-orange-200 rounded-lg p-6 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600 font-medium">Order #</span>
+                      <span className="text-lg font-bold text-gray-900">{order.orderNumber}</span>
+                    </div>
+                    <div 
+                      className="px-3 py-1 rounded-full text-white text-sm font-bold"
+                      style={{ 
+                        backgroundColor: getStatusColor(order.status)
+                      }}
+                    >
+                      {getStatusIcon(order.status)} {order.status.toUpperCase()}
+                    </div>
+                  </div>
 
-          {/* Completed Orders Section */}
-          {completedOrders.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                <span>✅</span>
-                <span>Order History</span>
-              </h2>
-              <div className="space-y-4">
-                {completedOrders.map(order => (
-                  <OrderCard key={order.id} order={order} isActive={false} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+                  <div className="order-details">
+                    <div className="detail-row">
+                      <span className="detail-label">📅 Date:</span>
+                      <span>{new Date(order.createdAt).toLocaleString()}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">🍽️ Items:</span>
+                      <span>{order.items.length} item{order.items.length > 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">💰 Total:</span>
+                      <span className="total-amount">${order.total.toFixed(2)}</span>
+                    </div>
+                  </div>
 
-        {/* Action Button */}
-        {activeOrders.length === 0 && orders.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10">
-            <button 
-              className="bg-primary-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:bg-primary-700 transition-colors"
-              onClick={() => navigate('/menu')}
-            >
-              Place New Order
-            </button>
+                  <div className="order-items-preview">
+                    {order.items.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="item-preview">
+                        <span className="item-name">{item.itemName}</span>
+                        <span className="item-qty">x{item.quantity}</span>
+                      </div>
+                    ))}
+                    {order.items.length > 3 && (
+                      <div className="more-items">
+                        +{order.items.length - 3} more item{order.items.length - 3 > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+
+                  <button 
+                    className="view-details-btn"
+                    onClick={() => navigate(`/order-status/${order.id}`)}
+                  >
+                    View Details →
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
+        )}
+
+        {/* Completed Orders Section */}
+        {completedOrders.length > 0 && (
+          <div className="orders-section">
+            <h2>✅ Order History</h2>
+            <div className="orders-list">
+              {completedOrders.map(order => (
+                <div key={order.id} className="order-card">
+                  <div className="order-header">
+                    <div className="order-number">
+                      <span className="label">Order #</span>
+                      <span className="value">{order.orderNumber}</span>
+                    </div>
+                    <div 
+                      className="order-status"
+                      style={{ 
+                        backgroundColor: getStatusColor(order.status),
+                        color: 'white',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '20px',
+                        fontWeight: 'bold',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      {getStatusIcon(order.status)} {order.status.toUpperCase()}
+                    </div>
+                  </div>
+
+                  <div className="order-details">
+                    <div className="detail-row">
+                      <span className="detail-label">📅 Date:</span>
+                      <span>{new Date(order.createdAt).toLocaleString()}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">🍽️ Items:</span>
+                      <span>{order.items.length} item{order.items.length > 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">💰 Total:</span>
+                      <span className="total-amount">${order.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <div className="order-items-preview">
+                    {order.items.slice(0, 2).map((item, idx) => (
+                      <div key={idx} className="item-preview">
+                        <span className="item-name">{item.itemName}</span>
+                        <span className="item-qty">x{item.quantity}</span>
+                      </div>
+                    ))}
+                    {order.items.length > 2 && (
+                      <div className="more-items">
+                        +{order.items.length - 2} more
+                      </div>
+                    )}
+                  </div>
+
+                  <button 
+                    className="view-details-btn secondary"
+                    onClick={() => navigate(`/order-status/${order.id}`)}
+                  >
+                    View Details
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Action Button */}
+      <div className="page-footer">
+        {activeOrders.length === 0 && (
+          <button 
+            className="new-order-btn"
+            onClick={() => navigate('/menu')}
+          >
+            Place New Order
+          </button>
         )}
       </div>
     </div>
