@@ -95,7 +95,7 @@ export const LocationPage: React.FC = () => {
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
         <button 
           className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors mb-3"
-          onClick={() => navigate('/')}
+          onClick={() => navigate(-1)}
         >
           <span className="text-xl">←</span>
           <span>Back</span>

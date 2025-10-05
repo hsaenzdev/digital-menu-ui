@@ -26,7 +26,10 @@ function App() {
               <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
               <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
               <Route path="/orders" element={<OrderHistoryPage />} />
+              <Route path="/order-history" element={<OrderHistoryPage />} />
               <Route path="/debug" element={<DebugPage />} />
+              {/* Fallback for root path - redirect to a default customer or show error */}
+              <Route path="/" element={<WelcomePage />} />
             </Routes>
           </div>
         </Router>

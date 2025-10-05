@@ -42,7 +42,7 @@ export const WelcomePage: React.FC = () => {
   }, [customerId, setCustomer])
 
   const handleStartOrder = () => {
-    navigate('/customer-info')
+    navigate('/location')
   }
 
   if (loading) {
