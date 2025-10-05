@@ -147,6 +147,27 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
             <span className="font-bold text-gray-900">Base Price: <span className="text-fire-600">${item.price.toFixed(2)}</span></span>
           </div>
 
+          {/* Quantity Selector - Prominent Position */}
+          <div className="bg-white border-2 border-fire-400 rounded-xl p-4 mb-4 shadow-md">
+            <label className="block text-center text-sm font-bold text-gray-900 mb-3">Quantity</label>
+            <div className="flex items-center justify-center space-x-6">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={quantity <= 1}
+                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
+              >
+                -
+              </button>
+              <span className="text-3xl font-bold min-w-[4rem] text-center text-gray-900">{quantity}</span>
+              <button 
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
           {errors.length > 0 && (
             <div className="bg-red-50 border-2 border-red-300 rounded-xl p-3 mb-4 shadow-md">
               {errors.map((error, index) => (
@@ -233,26 +254,6 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
               rows={3}
               className="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-fire-500 shadow-sm"
             />
-          </div>
-
-          <div className="border-t-2 border-fire-200 pt-4 mt-4">
-            <label className="block text-sm font-bold text-gray-900 mb-3">Quantity:</label>
-            <div className="flex items-center justify-center space-x-6">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={quantity <= 1}
-                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
-              >
-                -
-              </button>
-              <span className="text-2xl font-bold min-w-[3rem] text-center text-gray-900">{quantity}</span>
-              <button 
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
-              >
-                +
-              </button>
-            </div>
           </div>
         </div>
 
