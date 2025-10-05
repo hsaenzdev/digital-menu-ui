@@ -296,7 +296,7 @@ export const OrderConfirmationPage: React.FC = () => {
                     
                     {/* Special Notes */}
                     {item.specialNotes && (
-                      <div className="mt-2 text-xs text-gray-700 bg-yellow-50 p-2 rounded border-l-4 border-yellow-400">
+                      <div className="mt-2 text-sm text-fire-800 bg-amber-50 p-2 rounded border-l-4 border-fire-400">
                         <span className="font-bold">Note:</span> {item.specialNotes}
                       </div>
                     )}

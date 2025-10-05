@@ -58,9 +58,9 @@ export const WelcomePage: React.FC = () => {
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
-            <div className="text-7xl mb-4">❌</div>
-            <h3 className="text-2xl font-bold text-white drop-shadow-lg mb-2">Error</h3>
-            <p className="text-white/90 text-lg drop-shadow">{error}</p>
+            <div className="text-8xl mb-4">🔥</div>
+            <h3 className="text-3xl font-bold text-white drop-shadow-lg mb-3">Error</h3>
+            <p className="text-white/90 text-lg drop-shadow font-medium">{error}</p>
           </div>
         </div>
       </div>

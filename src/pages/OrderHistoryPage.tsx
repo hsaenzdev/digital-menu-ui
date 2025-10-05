@@ -107,9 +107,9 @@ export const OrderHistoryPage: React.FC = () => {
         {/* Error Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
           <div className="text-center py-12 px-4">
-            <div className="text-7xl mb-4">❌</div>
+            <div className="text-8xl mb-4">📋</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Failed to Load Orders</h3>
-            <p className="text-gray-600 mb-6 text-lg">{error}</p>
+            <p className="text-gray-600 mb-6 text-lg font-medium">{error}</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
               onClick={() => navigate('/menu')}
