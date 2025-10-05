@@ -109,7 +109,7 @@ export const OrderConfirmationPage: React.FC = () => {
         
         {/* Success Content */}
         <div className="flex-1 overflow-y-auto bg-gradient-to-b from-green-50 to-white">
-          <div className="p-4 pb-32">
+          <div className="p-4 pb-48">
             <div className="text-center py-12">
               <div className="text-7xl mb-4">🎉</div>
               <h2 className="text-3xl font-bold text-green-600 mb-2">Order Confirmed!</h2>
@@ -244,7 +244,7 @@ export const OrderConfirmationPage: React.FC = () => {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
-        <div className="p-4 pb-32 space-y-6"> {/* Bottom padding for sticky buttons */}
+        <div className="p-4 pb-40 space-y-6">
 
           {/* Customer Information */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">

@@ -164,7 +164,7 @@ export const OrderStatusPage: React.FC = () => {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
-        <div className="p-4 pb-32 space-y-6"> {/* Bottom padding for sticky buttons */}
+        <div className="p-4 pb-40 space-y-6">
 
           {/* Current Status */}
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center border-2 border-fire-200">
