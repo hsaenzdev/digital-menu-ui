@@ -192,11 +192,12 @@ export const CartPage: React.FC = () => {
                     <span>Add Tip</span>
                   </h3>
                   
-                  <div className="grid grid-cols-4 gap-2 mb-4">
+                  {/* Percentage Options in 2x2 Grid */}
+                  <div className="grid grid-cols-2 gap-2 mb-3">
                     {[15, 18, 20, 25].map(percentage => (
                       <button
                         key={percentage}
-                        className={`py-3 px-3 rounded-xl font-bold transition-all shadow-md ${
+                        className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
                           tipPercentage === percentage && !showCustomTip
                             ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white scale-105'
                             : 'bg-gray-100 text-gray-700 hover:bg-fire-50 hover:text-fire-600'
@@ -208,33 +209,46 @@ export const CartPage: React.FC = () => {
                     ))}
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  {/* No Tip and Custom Options */}
+                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      className={`py-3 px-6 rounded-xl font-bold transition-all shadow-md ${
+                      className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
+                        tipPercentage === 0 && !showCustomTip
+                          ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white scale-105'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                      onClick={() => handleTipChange(0)}
+                    >
+                      No Tip
+                    </button>
+                    
+                    <button
+                      className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
                         showCustomTip
-                          ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-fire-50'
+                          ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white scale-105'
+                          : 'bg-gray-100 text-gray-700 hover:bg-fire-50 hover:text-fire-600'
                       }`}
                       onClick={() => setShowCustomTip(!showCustomTip)}
                     >
                       Custom
                     </button>
-                    
-                    {showCustomTip && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-700 font-bold text-lg">$</span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={customTip}
-                          onChange={(e) => handleCustomTipChange(e.target.value)}
-                          className="w-24 px-3 py-2 border-2 border-fire-300 rounded-lg text-center font-bold focus:outline-none focus:ring-2 focus:ring-fire-500"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    )}
                   </div>
+                  
+                  {/* Custom Tip Input */}
+                  {showCustomTip && (
+                    <div className="flex items-center justify-center gap-2 mt-3 p-3 bg-fire-50 rounded-xl border-2 border-fire-200">
+                      <span className="text-gray-700 font-bold text-lg">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={customTip}
+                        onChange={(e) => handleCustomTipChange(e.target.value)}
+                        className="w-28 px-3 py-2 border-2 border-fire-300 rounded-lg text-center font-bold focus:outline-none focus:ring-2 focus:ring-fire-500"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Order Summary */}
