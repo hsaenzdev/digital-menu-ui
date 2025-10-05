@@ -7,7 +7,6 @@ import { CartPage } from './pages/CartPage'
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage'
 import { OrderStatusPage } from './pages/OrderStatusPage'
 import { OrderHistoryPage } from './pages/OrderHistoryPage'
-import { DebugPage } from './pages/DebugPage'
 import { CartProvider } from './context/CartContext'
 import { CustomerProvider } from './context/CustomerContext'
 
@@ -27,7 +26,6 @@ function App() {
               <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
               <Route path="/orders" element={<OrderHistoryPage />} />
               <Route path="/order-history" element={<OrderHistoryPage />} />
-              <Route path="/debug" element={<DebugPage />} />
               {/* Fallback for root path - redirect to a default customer or show error */}
               <Route path="/" element={<WelcomePage />} />
             </Routes>

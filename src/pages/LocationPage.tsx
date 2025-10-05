@@ -27,14 +27,12 @@ export const LocationPage: React.FC = () => {
         const { latitude, longitude } = position.coords
         
         try {
-          // In a real app, you would use a geocoding service to get the address
-          // For now, we'll use a mock address
           const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
           
           const location: LocationData = {
             latitude,
             longitude,
-            address: `Near ${address}` // Mock address
+            address: `Near ${address}`
           }
           
           setLocationData(location)
@@ -62,11 +60,10 @@ export const LocationPage: React.FC = () => {
       return
     }
 
-    // Mock coordinates for manual address
     const location: LocationData = {
-      latitude: 40.7128, // Mock NYC coordinates
-      longitude: -74.0060,
-      address: manualAddress.trim()
+      latitude: 0,
+      longitude: 0,
+      address: manualAddress
     }
     
     setLocationData(location)

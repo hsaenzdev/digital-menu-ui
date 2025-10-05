@@ -20,21 +20,12 @@ export const MenuPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
   const [showModifierModal, setShowModifierModal] = useState(false)
 
-  // Redirect if no customer info (temporarily disabled for testing)
-  useEffect(() => {
-    // if (!customer || !location) {
-    //   navigate('/customer-info')
-    // }
-  }, [customer, location, navigate])
-
   // Fetch categories on load
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch('/api/menu/categories')
         const data: ApiResponse<MenuCategory[]> = await response.json()
-        
-        console.log('Categories response:', data) // Debug log
         
         if (data.success && data.data) {
           setCategories(data.data)
@@ -45,8 +36,7 @@ export const MenuPage: React.FC = () => {
         } else {
           setError('Failed to load categories')
         }
-      } catch (err) {
-        console.error('Error fetching categories:', err)
+      } catch {
         setError('Failed to load menu categories')
       } finally {
         setLoading(false)
@@ -71,16 +61,13 @@ export const MenuPage: React.FC = () => {
       const response = await fetch(`/api/menu/categories/${categoryId}/items`)
       const data: ApiResponse<MenuItem[]> = await response.json()
       
-      console.log('Items response:', data) // Debug log
-      
       if (data.success && data.data) {
         setItems(data.data)
       } else {
         setError('Failed to load menu items')
         setItems([])
       }
-    } catch (err) {
-      console.error('Error fetching items:', err)
+    } catch {
       setError('Failed to load menu items')
       setItems([])
     } finally {
@@ -142,11 +129,6 @@ export const MenuPage: React.FC = () => {
 
   const goToCart = () => {
     navigate('/cart')
-  }
-
-  if (!customer || !location) {
-    // return <div>Redirecting...</div>
-    // Temporarily allow access for testing
   }
 
   return (

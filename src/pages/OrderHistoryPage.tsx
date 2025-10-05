@@ -232,10 +232,7 @@ export const OrderHistoryPage: React.FC = () => {
                     {order.status === 'delivered' && (
                       <button 
                         className="flex-1 bg-gradient-to-r from-fire-500 to-ember-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:from-fire-600 hover:to-ember-600 transition-all shadow-md transform active:scale-95"
-                        onClick={() => {
-                          // TODO: Implement reorder functionality
-                          navigate('/menu')
-                        }}
+                        onClick={() => navigate('/menu')}
                       >
                         🔄 Reorder
                       </button>

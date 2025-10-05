@@ -36,8 +36,7 @@ export const useActiveOrders = (): UseActiveOrdersResult => {
       } else {
         setError(data.error || 'Failed to load orders')
       }
-    } catch (err) {
-      console.error('Error fetching orders:', err)
+    } catch {
       setError('Failed to check active orders')
     } finally {
       setLoading(false)

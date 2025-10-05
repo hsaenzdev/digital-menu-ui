@@ -25,13 +25,8 @@ export const WelcomePage: React.FC = () => {
         if (data.success && data.data) {
           // Customer exists - store in context
           setCustomer(data.data)
-        } else {
-          // Customer not found - this should not happen as WA creates customer first
-          // But we'll handle it gracefully
-          console.warn('Customer not found, will need to create')
         }
-      } catch (err) {
-        console.error('Error fetching customer:', err)
+      } catch {
         setError('Failed to load customer information')
       } finally {
         setLoading(false)
@@ -131,22 +126,12 @@ export const WelcomePage: React.FC = () => {
 
       {/* Fixed Start Order Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <div className="space-y-2">
-          <button 
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-xl py-5 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-            onClick={handleStartOrder}
-          >
-            🔥 Start Your Order
-          </button>
-          
-          {/* Temporary test button for development */}
-          <button 
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform active:scale-95"
-            onClick={() => navigate('/menu')}
-          >
-            🧪 Test Menu (Dev)
-          </button>
-        </div>
+        <button 
+          className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-xl py-5 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+          onClick={handleStartOrder}
+        >
+          🔥 Start Your Order
+        </button>
       </div>
     </div>
   )
