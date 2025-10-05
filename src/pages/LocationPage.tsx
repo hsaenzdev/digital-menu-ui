@@ -90,73 +90,72 @@ export const LocationPage: React.FC = () => {
   }, [useManualAddress])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-4">
-      <div className="w-full sm:max-w-2xl sm:mx-auto py-4 sm:py-8">
-        <div className="bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 animate-fade-in">
-          {/* Page Header */}
-          <div className="mb-6 sm:mb-8">
-            <button 
-              className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors text-sm sm:text-base"
-              onClick={() => navigate('/')}
-            >
-              ← Back
-            </button>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-              📍 Your Location
-            </h1>
-            <p className="text-gray-600 text-sm sm:text-base">
-              We need your location to calculate delivery time and fees
-            </p>
-          </div>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+        <button 
+          className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors mb-3"
+          onClick={() => navigate('/')}
+        >
+          <span className="text-xl">←</span>
+          <span>Back</span>
+        </button>
+        <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">📍 Your Location</h1>
+        <p className="text-fire-100 text-sm mt-1">We need your location to calculate delivery time and fees</p>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
+        <div className="p-4 pb-32">{/* Extra bottom padding for fixed button */}
 
           {/* Location Content */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-6">
             {!useManualAddress ? (
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-6">
                 <div className="flex justify-center">
-                  <div className="text-5xl sm:text-6xl md:text-7xl animate-pulse-slow">🎯</div>
+                  <div className="text-7xl animate-pulse-slow">🎯</div>
                 </div>
                 
                 {loading && (
                   <div className="text-center space-y-3">
-                    <p className="text-gray-600 font-medium text-sm sm:text-base">Getting your location...</p>
+                    <p className="text-gray-600 font-medium">Getting your location...</p>
                     <div className="flex justify-center">
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-4 border-fire-200 border-t-fire-600 rounded-full animate-spin"></div>
                     </div>
                   </div>
                 )}
 
                 {locationData && !loading && (
-                  <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4 sm:p-6 space-y-2">
-                    <h3 className="text-lg sm:text-xl font-bold text-green-800 flex items-center gap-2">
+                  <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-6 space-y-2 shadow-lg">
+                    <h3 className="text-xl font-bold text-green-800 flex items-center gap-2">
                       <span>✅</span> Location Found
                     </h3>
-                    <p className="text-gray-800 font-medium text-base sm:text-lg break-words">
+                    <p className="text-gray-800 font-medium text-lg break-words">
                       {locationData.address}
                     </p>
-                    <p className="text-gray-500 text-xs sm:text-sm">
+                    <p className="text-gray-500 text-sm">
                       {locationData.latitude.toFixed(4)}, {locationData.longitude.toFixed(4)}
                     </p>
                   </div>
                 )}
 
                 {error && (
-                  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-3 sm:p-4">
-                    <p className="text-red-600 font-medium text-sm sm:text-base">❌ {error}</p>
+                  <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 shadow-md">
+                    <p className="text-red-600 font-bold">❌ {error}</p>
                   </div>
                 )}
 
                 <div className="space-y-3">
                   <button 
-                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={getCurrentLocation}
                     disabled={loading}
                   >
-                    {loading ? 'Getting Location...' : '📍 Use My Location'}
+                    {loading ? '⏳ Getting Location...' : '📍 Use My Location'}
                   </button>
                   
                   <button 
-                    className="w-full bg-white text-primary-600 border-2 border-primary-600 font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-xl hover:bg-primary-50 transition-colors text-sm sm:text-base"
+                    className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
                     onClick={() => setUseManualAddress(true)}
                   >
                     📝 Enter Address Manually
@@ -164,31 +163,28 @@ export const LocationPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800">📝 Enter Your Address</h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-2xl font-bold text-gray-800">📝 Enter Your Address</h3>
                   <button 
-                    className="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors self-start sm:self-auto"
+                    className="text-fire-600 hover:text-fire-700 font-bold text-sm transition-colors"
                     onClick={() => setUseManualAddress(false)}
                   >
-                    📍 Use GPS Instead
+                    ← Use GPS
                   </button>
                 </div>
-
+                
                 <div className="space-y-4">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                    Delivery Address
-                  </label>
                   <textarea
-                    id="address"
+                    className="w-full px-4 py-3 border-2 border-fire-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium shadow-md"
+                    placeholder="Enter your delivery address..."
+                    rows={4}
                     value={manualAddress}
                     onChange={(e) => setManualAddress(e.target.value)}
-                    placeholder="Enter your full address including street, city, and postal code"
-                    rows={3}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all resize-none text-gray-800 text-sm sm:text-base"
                   />
+                  
                   <button 
-                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
                     onClick={handleManualAddressSubmit}
                   >
                     Confirm Address
@@ -196,37 +192,33 @@ export const LocationPage: React.FC = () => {
                 </div>
 
                 {locationData && (
-                  <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4 sm:p-6 space-y-2">
-                    <h4 className="text-base sm:text-lg font-bold text-green-800 flex items-center gap-2">
+                  <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-6 space-y-2 shadow-lg">
+                    <h4 className="text-lg font-bold text-green-800 flex items-center gap-2">
                       <span>✅</span> Address Confirmed
                     </h4>
-                    <p className="text-gray-800 font-medium text-sm sm:text-base break-words">
+                    <p className="text-gray-800 font-medium break-words">
                       {locationData.address}
                     </p>
                   </div>
                 )}
               </div>
             )}
-
-            {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-3 sm:p-4">
-                <p className="text-red-600 font-medium text-sm sm:text-base">{error}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
-            <button 
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              onClick={handleContinue}
-              disabled={!locationData}
-            >
-              Continue →
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Fixed Continue Button */}
+      {locationData && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
+          <button 
+            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleContinue}
+            disabled={!locationData}
+          >
+            Continue →
+          </button>
+        </div>
+      )}
     </div>
   )
 }

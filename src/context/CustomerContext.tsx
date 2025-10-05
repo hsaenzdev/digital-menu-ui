@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import type { Customer, LocationData } from '../types'
 
@@ -47,20 +47,20 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
     }
   }, [location])
 
-  const setCustomer = (customer: Customer) => {
+  const setCustomer = useCallback((customer: Customer) => {
     setCustomerState(customer)
-  }
+  }, [])
 
-  const setLocation = (location: LocationData) => {
+  const setLocation = useCallback((location: LocationData) => {
     setLocationState(location)
-  }
+  }, [])
 
-  const clearCustomer = () => {
+  const clearCustomer = useCallback(() => {
     setCustomerState(null)
     setLocationState(null)
     localStorage.removeItem('digital-menu-customer')
     localStorage.removeItem('digital-menu-location')
-  }
+  }, [])
 
   return (
     <CustomerContext.Provider

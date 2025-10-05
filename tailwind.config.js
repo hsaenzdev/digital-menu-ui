@@ -15,46 +15,51 @@ export default {
     },
     extend: {
       colors: {
-        // Primary brand colors (purple gradient)
-        primary: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
+        // Fire/Orange theme colors
+        fire: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
         },
-        // Secondary accent (indigo)
-        secondary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
+        flame: {
+          50: '#fef3c7',
+          100: '#fde68a',
+          200: '#fcd34d',
+          300: '#fbbf24',
+          400: '#f59e0b',
+          500: '#d97706',
+          600: '#b45309',
+          700: '#92400e',
+          800: '#78350f',
+          900: '#451a03',
         },
-        // Restaurant theme colors
-        restaurant: {
-          primary: '#667eea',
-          secondary: '#764ba2',
-          accent: '#f093fb',
+        ember: {
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
         },
         // Status colors
         status: {
-          pending: '#ffc107',
-          confirmed: '#17a2b8',
-          preparing: '#fd7e14',
-          ready: '#28a745',
-          delivered: '#6f42c1',
-          cancelled: '#dc3545',
+          pending: '#f59e0b',
+          confirmed: '#3b82f6',
+          preparing: '#f97316',
+          ready: '#22c55e',
+          delivered: '#8b5cf6',
+          cancelled: '#ef4444',
         }
       },
       fontFamily: {

@@ -77,20 +77,18 @@ export const OrderHistoryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
-        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center">📋 Order History</h1>
-            <p className="text-purple-100 text-xs sm:text-sm md:text-base text-center">Loading your orders...</p>
-          </div>
-          
-          {/* Loading Content */}
-          <div className="p-4 sm:p-6">
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4 animate-pulse">⏳</div>
-              <p className="text-gray-600">Loading your order history...</p>
-            </div>
+      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+        {/* Fixed Header */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order History</h1>
+          <p className="text-fire-100 text-sm mt-1 text-center">Loading your orders...</p>
+        </div>
+        
+        {/* Loading Content */}
+        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+          <div className="text-center py-12">
+            <div className="text-7xl mb-4 animate-pulse">⏳</div>
+            <p className="text-gray-600 font-medium text-lg">Loading your order history...</p>
           </div>
         </div>
       </div>
@@ -99,27 +97,25 @@ export const OrderHistoryPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
-        <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-center">📋 Order History</h1>
-            <p className="text-purple-100 text-xs sm:text-sm md:text-base text-center">Error loading orders</p>
-          </div>
-          
-          {/* Error Content */}
-          <div className="p-4 sm:p-6">
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">❌</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Failed to Load Orders</h3>
-              <p className="text-gray-600 mb-6">{error}</p>
-              <button 
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-8 rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-card hover:shadow-card-hover"
-                onClick={() => navigate('/menu')}
-              >
-                Browse Menu
-              </button>
-            </div>
+      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+        {/* Fixed Header */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order History</h1>
+          <p className="text-fire-100 text-sm mt-1 text-center">Error loading orders</p>
+        </div>
+        
+        {/* Error Content */}
+        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+          <div className="text-center py-12 px-4">
+            <div className="text-7xl mb-4">❌</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Failed to Load Orders</h3>
+            <p className="text-gray-600 mb-6 text-lg">{error}</p>
+            <button 
+              className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+              onClick={() => navigate('/menu')}
+            >
+              Browse Menu
+            </button>
           </div>
         </div>
       </div>
@@ -127,142 +123,139 @@ export const OrderHistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 p-2 sm:p-4">
-      <div className="w-full sm:max-w-4xl sm:mx-auto bg-white rounded-3xl shadow-modal overflow-hidden relative">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex items-center justify-between">
-            <button 
-              className="text-white hover:text-purple-100 font-medium flex items-center gap-1 sm:gap-2 transition-colors text-sm sm:text-base"
-              onClick={() => navigate('/menu')}
-            >
-              ← <span className="hidden xs:inline">Back</span>
-            </button>
-            <div className="text-center flex-1 px-2">
-              <h1 className="text-lg sm:text-2xl md:text-3xl font-bold">📋 Order History</h1>
-              <p className="text-purple-100 text-xs sm:text-sm md:text-base">Your past orders</p>
-            </div>
-            <div className="w-8"></div> {/* Spacer for centering */}
-          </div>
-
-          {/* Customer Summary */}
-          {customer && (
-            <div className="flex flex-col xs:flex-row gap-1 xs:gap-3 text-xs sm:text-sm text-purple-100 mt-3 pt-3 border-t border-purple-400">
-              <span className="flex items-center gap-1 truncate">
-                👤 <span className="truncate">{customer.name}</span>
-              </span>
-              <span className="flex items-center gap-1 truncate">
-                📞 <span className="truncate">{customer.phoneNumber}</span>
-              </span>
-            </div>
-          )}
+    <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+        <div className="flex items-center justify-between mb-2">
+          <button 
+            className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
+            onClick={() => navigate('/menu')}
+          >
+            <span className="text-xl">←</span>
+            <span>Back</span>
+          </button>
+          <div className="w-12"></div> {/* Spacer for centering */}
         </div>
+        <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order History</h1>
+        <p className="text-fire-100 text-sm mt-1 text-center">Your past orders</p>
 
-        {/* Scrollable Content Area */}
-        <div className="h-[calc(100vh-16rem)] overflow-y-auto">
-          <div className="p-4 sm:p-6 pb-24 space-y-6"> {/* Bottom padding for sticky button */}
+        {/* Customer Summary */}
+        {customer && (
+          <div className="flex flex-col xs:flex-row gap-1 xs:gap-3 text-xs sm:text-sm text-fire-100 mt-3 pt-3 border-t border-fire-400">
+            <span className="flex items-center gap-1 truncate">
+              👤 <span className="truncate font-medium">{customer.name}</span>
+            </span>
+            <span className="flex items-center gap-1 truncate">
+              📞 <span className="truncate font-medium">{customer.phoneNumber}</span>
+            </span>
+          </div>
+        )}
+      </div>
 
-            {orders.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-7xl mb-4">📋</div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
-                <p className="text-gray-600 mb-6">You haven't placed any orders. Start browsing our menu!</p>
-                <button 
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold px-8 py-3 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all"
-                  onClick={() => navigate('/menu')}
-                >
-                  Browse Menu
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold text-gray-900">Your Orders ({orders.length})</h2>
-                
-                {orders.map((order) => (
-                  <div key={order.id} className="bg-white rounded-2xl shadow-card p-6 border border-gray-100 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-bold text-gray-900">Order #{order.orderNumber}</h3>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
-                            {getStatusIcon(order.status)} {order.status}
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
+        <div className="p-4 pb-32 space-y-6"> {/* Bottom padding for sticky button */}
+
+          {orders.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-7xl mb-4">📋</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
+              <p className="text-gray-600 mb-6 text-lg">You haven't placed any orders. Start browsing our menu!</p>
+              <button 
+                className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+                onClick={() => navigate('/menu')}
+              >
+                Browse Menu
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">Your Orders ({orders.length})</h2>
+              
+              {orders.map((order) => (
+                <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200 hover:shadow-xl transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-bold text-gray-900">Order #{order.orderNumber}</h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${getStatusColor(order.status)}`}>
+                          {getStatusIcon(order.status)} {order.status}
+                        </span>
+                      </div>
+                      
+                      <div className="text-sm text-gray-600 space-y-1 font-medium">
+                        <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
+                        <div>📍 {order.location}</div>
+                        <div className="font-bold text-fire-600">💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="ml-4 bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md transform active:scale-95"
+                      onClick={() => navigate(`/order-status/${order.id}`)}
+                    >
+                      View Details
+                    </button>
+                  </div>
+                  
+                  {/* Order Items Preview */}
+                  <div className="bg-gradient-to-r from-fire-50 to-ember-50 rounded-xl p-4 border border-fire-200">
+                    <h4 className="font-bold text-gray-900 mb-2">Items:</h4>
+                    <div className="space-y-2">
+                      {order.items.slice(0, 3).map((item, index) => (
+                        <div key={index} className="flex justify-between text-sm">
+                          <span className="text-gray-700 font-medium">
+                            {item.quantity}x {item.itemName}
+                          </span>
+                          <span className="text-gray-900 font-bold">
+                            ${item.totalPrice.toFixed(2)}
                           </span>
                         </div>
-                        
-                        <div className="text-sm text-gray-600 space-y-1">
-                          <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
-                          <div>📍 {order.location}</div>
-                          <div>💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
+                      ))}
+                      {order.items.length > 3 && (
+                        <div className="text-sm text-gray-500 italic font-medium">
+                          +{order.items.length - 3} more item{order.items.length - 3 !== 1 ? 's' : ''}
                         </div>
-                      </div>
-                      
-                      <button 
-                        className="ml-4 bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
-                        onClick={() => navigate(`/order-status/${order.id}`)}
-                      >
-                        View Details
-                      </button>
-                    </div>
-                    
-                    {/* Order Items Preview */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-900 mb-2">Items:</h4>
-                      <div className="space-y-2">
-                        {order.items.slice(0, 3).map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span className="text-gray-700">
-                              {item.quantity}x {item.itemName}
-                            </span>
-                            <span className="text-gray-900 font-medium">
-                              ${item.totalPrice.toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                        {order.items.length > 3 && (
-                          <div className="text-sm text-gray-500 italic">
-                            +{order.items.length - 3} more item{order.items.length - 3 !== 1 ? 's' : ''}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Quick Actions */}
-                    <div className="flex gap-2 mt-4">
-                      <button 
-                        className="flex-1 bg-white text-purple-600 border border-purple-600 text-sm px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors"
-                        onClick={() => navigate(`/order-status/${order.id}`)}
-                      >
-                        📋 View Status
-                      </button>
-                      
-                      {order.status === 'delivered' && (
-                        <button 
-                          className="flex-1 bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                          onClick={() => {
-                            // TODO: Implement reorder functionality
-                            navigate('/menu')
-                          }}
-                        >
-                          🔄 Reorder
-                        </button>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  
+                  {/* Quick Actions */}
+                  <div className="flex gap-2 mt-4">
+                    <button 
+                      className="flex-1 bg-white text-fire-600 border-2 border-fire-500 text-sm font-bold px-4 py-2 rounded-lg hover:bg-fire-50 transition-all shadow-md"
+                      onClick={() => navigate(`/order-status/${order.id}`)}
+                    >
+                      📋 View Status
+                    </button>
+                    
+                    {order.status === 'delivered' && (
+                      <button 
+                        className="flex-1 bg-gradient-to-r from-fire-500 to-ember-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:from-fire-600 hover:to-ember-600 transition-all shadow-md transform active:scale-95"
+                        onClick={() => {
+                          // TODO: Implement reorder functionality
+                          navigate('/menu')
+                        }}
+                      >
+                        🔄 Reorder
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Fixed Action Button */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-4 rounded-b-3xl">
-          <button 
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-            onClick={() => navigate('/menu')}
-          >
-            Browse Menu
-          </button>
-        </div>
+      {/* Fixed Action Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
+        <button 
+          className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+          onClick={() => navigate('/menu')}
+        >
+          Browse Menu
+        </button>
       </div>
     </div>
   )

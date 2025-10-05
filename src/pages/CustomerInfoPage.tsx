@@ -84,82 +84,94 @@ export const CustomerInfoPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 p-2 sm:p-4">
-      <div className="w-full sm:max-w-2xl sm:mx-auto bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8">
-        <div className="mb-6">
-          <button 
-            className="flex items-center text-primary-600 hover:text-primary-700 font-medium mb-4 transition-colors"
-            onClick={() => navigate('/location')}
-          >
-            ← Back
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">👤 Your Information</h1>
-          <p className="text-gray-600">We need your contact details to process your order</p>
-        </div>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+        <button 
+          className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors mb-3"
+          onClick={() => navigate('/location')}
+        >
+          <span className="text-xl">←</span>
+          <span>Back</span>
+        </button>
+        <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">👤 Your Information</h1>
+        <p className="text-fire-100 text-sm mt-1">We need your contact details to process your order</p>
+      </div>
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <span className="text-xl">📍</span>
-            <span className="text-gray-700 font-medium">{location.address}</span>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
+        <div className="p-4 pb-32">{/* Extra bottom padding for fixed button */}
+
+          {/* Location Display */}
+          <div className="bg-gradient-to-r from-fire-50 to-ember-50 border-2 border-fire-300 rounded-2xl p-4 mb-6 shadow-md">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">📍</span>
+              <span className="text-gray-800 font-medium">{location.address}</span>
+            </div>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Phone Number Display */}
           {customer?.phoneNumber && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-xl">📱</span>
-                <span className="text-sm text-blue-800 font-medium">Phone Number:</span>
-                <span className="text-blue-900">{customer.phoneNumber}</span>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl p-4 mb-6 shadow-md">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📱</span>
+                <span className="text-sm text-blue-800 font-bold">Phone:</span>
+                <span className="text-blue-900 font-medium">{customer.phoneNumber}</span>
               </div>
             </div>
           )}
 
-          <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={customer?.name ? customer.name : "Enter your full name"}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
-            {customer?.name && (
-              <div className="mt-2 text-sm text-green-600 flex items-center space-x-1">
-                <span>✅</span>
-                <span>Name on file: {customer.name}</span>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-3">
+              <label htmlFor="name" className="block text-base font-bold text-gray-800">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={customer?.name ? customer.name : "Enter your full name"}
+                required
+                className="w-full px-4 py-3 border-2 border-fire-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium shadow-md text-lg"
+              />
+              {customer?.name && (
+                <div className="mt-2 text-sm text-green-700 font-medium flex items-center gap-2 bg-green-50 border border-green-300 rounded-lg p-2">
+                  <span>✅</span>
+                  <span>Name on file: {customer.name}</span>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 flex items-center gap-2 shadow-md">
+                <span className="text-xl">❌</span>
+                <span className="text-red-700 font-bold">{error}</span>
               </div>
             )}
+          </form>
+
+          {/* Security Notice */}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
+              <span className="text-lg">🔒</span>
+              <span>Your information is secure and only used for orders</span>
+            </p>
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-2">
-              <span className="text-red-500">❌</span>
-              <span className="text-red-700">{error}</span>
-            </div>
-          )}
-
-          <div className="pt-4">
-            <button 
-              type="submit"
-              className="w-full bg-primary-600 text-white py-4 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              disabled={loading || !name}
-            >
-              {loading ? 'Processing...' : 'Continue to Menu →'}
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500 flex items-center justify-center space-x-1">
-            <span>🔒</span>
-            <span>Your information is secure and will only be used for order processing</span>
-          </p>
         </div>
+      </div>
+
+      {/* Fixed Continue Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
+        <button 
+          type="submit"
+          onClick={handleSubmit}
+          className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || !name}
+        >
+          {loading ? '⏳ Processing...' : 'Continue to Menu →'}
+        </button>
       </div>
     </div>
   )

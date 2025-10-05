@@ -47,10 +47,12 @@ export const WelcomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-modal p-8 text-center max-w-md w-full">
-          <div className="text-6xl mb-4 animate-pulse-slow">⏳</div>
-          <p className="text-gray-600 text-lg">Loading...</p>
+      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="text-8xl mb-6 animate-bounce">🔥</div>
+            <p className="text-white text-2xl font-bold">Loading...</p>
+          </div>
         </div>
       </div>
     )
@@ -58,83 +60,91 @@ export const WelcomePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-modal p-8 text-center max-w-md w-full">
-          <div className="text-6xl mb-4">❌</div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">Error</h3>
-          <p className="text-gray-600">{error}</p>
+      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 text-center max-w-md w-full">
+            <div className="text-6xl mb-4">❌</div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Error</h3>
+            <p className="text-gray-600">{error}</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white rounded-3xl shadow-modal p-4 sm:p-6 md:p-8 w-full sm:max-w-2xl animate-fade-in">
-        {/* Restaurant Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-            🍽️ Digital Menu
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg">Delicious food delivered to your door</p>
-        </div>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="min-h-full flex items-center justify-center p-4 py-8">
+          <div className="w-full max-w-md">
+            {/* Restaurant Header */}
+            <div className="text-center mb-8">
+              <div className="text-8xl mb-4 drop-shadow-2xl">🔥</div>
+              <h1 className="text-5xl font-bold text-white drop-shadow-lg mb-3">
+                Digital Menu
+              </h1>
+              <p className="text-white/90 text-xl font-bold drop-shadow">Hot food delivered fresh to your door!</p>
+            </div>
 
-        {/* Welcome Content */}
-        <div className="space-y-6 sm:space-y-8">
-          {/* Food Icon */}
-          <div className="flex justify-center">
-            <div className="text-6xl sm:text-7xl md:text-8xl filter drop-shadow-lg animate-pulse-slow">
-              🍔🍟🥤
+            {/* Welcome Content - White Card */}
+            <div className="bg-white rounded-3xl shadow-2xl p-6 space-y-6">
+              {/* Food Icon */}
+              <div className="flex justify-center">
+                <div className="text-7xl filter drop-shadow-lg animate-pulse-slow">
+                  🍔🍟🥤
+                </div>
+              </div>
+
+              {/* Welcome Text */}
+              <div className="text-center space-y-4">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Welcome to our restaurant!
+                </h2>
+                <p className="text-gray-600 text-lg">
+                  Order your favorite meals with just a few taps
+                </p>
+                
+                {/* Features List */}
+                <div className="grid gap-3 mt-6">
+                  <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-fire-50 to-amber-50 rounded-xl border-2 border-fire-200 shadow-md">
+                    <span className="text-3xl">📱</span>
+                    <span className="text-gray-700 font-bold">Easy mobile ordering</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-fire-50 to-amber-50 rounded-xl border-2 border-fire-200 shadow-md">
+                    <span className="text-3xl">🚚</span>
+                    <span className="text-gray-700 font-bold">Fast delivery</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-fire-50 to-amber-50 rounded-xl border-2 border-fire-200 shadow-md">
+                    <span className="text-3xl">💳</span>
+                    <span className="text-gray-700 font-bold">Secure payment</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Start Order Button */}
+              <button 
+                className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+                onClick={handleStartOrder}
+              >
+                🔥 Start Your Order
+              </button>
+              
+              {/* Temporary test button for development */}
+              <button 
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all"
+                onClick={() => navigate('/menu')}
+              >
+                🧪 Test Menu (Dev)
+              </button>
+
+              {/* Footer */}
+              <div className="pt-6 border-t-2 border-fire-200 text-center space-y-2 text-gray-600 font-medium">
+                <p>🕐 Open daily: 10:00 AM - 10:00 PM</p>
+                <p>📞 Questions? Call us at (555) 123-4567</p>
+              </div>
             </div>
           </div>
-
-          {/* Welcome Text */}
-          <div className="text-center space-y-4">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
-              Welcome to our restaurant!
-            </h2>
-            <p className="text-gray-600 text-base sm:text-lg">
-              Order your favorite meals with just a few taps
-            </p>
-            
-            {/* Features List */}
-            <div className="grid gap-3 sm:gap-4 md:gap-6 mt-6">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl">
-                <span className="text-2xl sm:text-3xl">📱</span>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Easy mobile ordering</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl">
-                <span className="text-2xl sm:text-3xl">🚚</span>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Fast delivery</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl">
-                <span className="text-2xl sm:text-3xl">💳</span>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Secure payment</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Start Order Button */}
-          <button 
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-card hover:shadow-card-hover transform hover:scale-105 transition-all duration-200"
-            onClick={handleStartOrder}
-          >
-            Start Your Order
-          </button>
-          
-          {/* Temporary test button for development */}
-          <button 
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-xl shadow-card transition-all duration-200 text-sm sm:text-base"
-            onClick={() => navigate('/menu')}
-          >
-            🧪 Test Menu (Dev)
-          </button>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 text-center space-y-2 text-gray-600 text-sm sm:text-base">
-          <p>🕐 Open daily: 10:00 AM - 10:00 PM</p>
-          <p>📞 Questions? Call us at (555) 123-4567</p>
         </div>
       </div>
     </div>
