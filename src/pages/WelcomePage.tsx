@@ -37,7 +37,7 @@ export const WelcomePage: React.FC = () => {
   }, [customerId, setCustomer])
 
   const handleStartOrder = () => {
-    navigate('/location')
+    navigate('/setup')
   }
 
   if (loading) {

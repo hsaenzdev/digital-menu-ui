@@ -7,12 +7,11 @@ export const LocationPage: React.FC = () => {
   const navigate = useNavigate()
   const { setLocation } = useCustomer()
   const [locationData, setLocationData] = useState<LocationData | null>(null)
-  const [manualAddress, setManualAddress] = useState('')
-  const [useManualAddress, setUseManualAddress] = useState(false)
+  const [address, setAddress] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = async () => {
     setLoading(true)
     setError('')
 
@@ -27,18 +26,51 @@ export const LocationPage: React.FC = () => {
         const { latitude, longitude } = position.coords
         
         try {
-          const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+          // Call our backend geocoding endpoint
+          const response = await fetch(
+            `http://localhost:3000/api/geocoding/reverse?lat=${latitude}&lon=${longitude}`
+          )
           
-          const location: LocationData = {
-            latitude,
-            longitude,
-            address: `Near ${address}`
+          if (response.ok) {
+            const data = await response.json()
+            const geocodedAddress = data.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+            
+            // Set the address in the input field (user can edit)
+            setAddress(geocodedAddress)
+            
+            // Store location data with coordinates
+            const location: LocationData = {
+              latitude,
+              longitude,
+              address: geocodedAddress
+            }
+            
+            setLocationData(location)
+          } else {
+            // Fallback to coordinates if geocoding fails
+            const fallbackAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+            setAddress(fallbackAddress)
+            
+            setLocationData({
+              latitude,
+              longitude,
+              address: fallbackAddress
+            })
           }
           
-          setLocationData(location)
           setLoading(false)
-        } catch {
-          setError('Failed to get address for your location')
+        } catch (err) {
+          console.error('Geocoding error:', err)
+          // Fallback to coordinates
+          const fallbackAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+          setAddress(fallbackAddress)
+          
+          setLocationData({
+            latitude,
+            longitude,
+            address: fallbackAddress
+          })
+          
           setLoading(false)
         }
       },
@@ -54,37 +86,43 @@ export const LocationPage: React.FC = () => {
     )
   }
 
-  const handleManualAddressSubmit = () => {
-    if (!manualAddress.trim()) {
-      setError('Please enter your address')
-      return
-    }
-
-    const location: LocationData = {
-      latitude: 0,
-      longitude: 0,
-      address: manualAddress
-    }
+  const handleAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newAddress = e.target.value
+    setAddress(newAddress)
     
-    setLocationData(location)
+    // Update location data with new address (keep coordinates)
+    if (locationData) {
+      setLocationData({
+        ...locationData,
+        address: newAddress
+      })
+    }
   }
 
   const handleContinue = () => {
-    if (!locationData) {
-      setError('Please provide your location')
+    if (!address.trim()) {
+      setError('Please provide your delivery address')
       return
     }
 
-    setLocation(locationData)
+    // Ensure we have location data with the current address
+    const finalLocation: LocationData = locationData || {
+      latitude: 0,
+      longitude: 0,
+      address: address.trim()
+    }
+
+    // Update address to match input
+    finalLocation.address = address.trim()
+
+    setLocation(finalLocation)
     navigate('/customer-info')
   }
 
   useEffect(() => {
-    // Auto-try to get location on load
-    if (!useManualAddress) {
-      getCurrentLocation()
-    }
-  }, [useManualAddress])
+    // Auto-fetch location on mount
+    getCurrentLocation()
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
@@ -105,117 +143,70 @@ export const LocationPage: React.FC = () => {
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
         <div className="p-4 pb-32">{/* Extra bottom padding for fixed button */}
 
-          {/* Location Content */}
           <div className="space-y-6">
-            {!useManualAddress ? (
-              <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="text-7xl animate-pulse-slow">🎯</div>
+            </div>
+            
+            {loading && (
+              <div className="text-center space-y-3">
+                <p className="text-gray-600 font-medium">Getting your location...</p>
                 <div className="flex justify-center">
-                  <div className="text-7xl animate-pulse-slow">🎯</div>
+                  <div className="w-8 h-8 border-4 border-fire-200 border-t-fire-600 rounded-full animate-spin"></div>
                 </div>
-                
-                {loading && (
-                  <div className="text-center space-y-3">
-                    <p className="text-gray-600 font-medium">Getting your location...</p>
-                    <div className="flex justify-center">
-                      <div className="w-8 h-8 border-4 border-fire-200 border-t-fire-600 rounded-full animate-spin"></div>
-                    </div>
-                  </div>
-                )}
-
-                {locationData && !loading && (
-                  <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-6 space-y-2 shadow-lg">
-                    <h3 className="text-xl font-bold text-green-800 flex items-center gap-2">
-                      <span>✅</span> Location Found
-                    </h3>
-                    <p className="text-gray-800 font-medium text-lg break-words">
-                      {locationData.address}
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                      {locationData.latitude.toFixed(4)}, {locationData.longitude.toFixed(4)}
-                    </p>
-                  </div>
-                )}
-
-                {error && (
-                  <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 shadow-md">
-                    <p className="text-red-600 font-bold">❌ {error}</p>
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  <button 
-                    className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={getCurrentLocation}
-                    disabled={loading}
-                  >
-                    {loading ? '⏳ Getting Location...' : '📍 Use My Location'}
-                  </button>
-                  
-                  <button 
-                    className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-                    onClick={() => setUseManualAddress(true)}
-                  >
-                    📝 Enter Address Manually
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-2xl font-bold text-gray-800">📝 Enter Your Address</h3>
-                  <button 
-                    className="text-fire-600 hover:text-fire-700 font-bold text-sm transition-colors"
-                    onClick={() => setUseManualAddress(false)}
-                  >
-                    ← Use GPS
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  <textarea
-                    className="w-full px-4 py-3 border-2 border-fire-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium shadow-md"
-                    placeholder="Enter your delivery address..."
-                    rows={4}
-                    value={manualAddress}
-                    onChange={(e) => setManualAddress(e.target.value)}
-                  />
-                  
-                  <button 
-                    className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-                    onClick={handleManualAddressSubmit}
-                  >
-                    Confirm Address
-                  </button>
-                </div>
-
-                {locationData && (
-                  <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-6 space-y-2 shadow-lg">
-                    <h4 className="text-lg font-bold text-green-800 flex items-center gap-2">
-                      <span>✅</span> Address Confirmed
-                    </h4>
-                    <p className="text-gray-800 font-medium break-words">
-                      {locationData.address}
-                    </p>
-                  </div>
-                )}
               </div>
             )}
+
+            {error && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 shadow-md">
+                <p className="text-red-600 font-bold">❌ {error}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-gray-700 font-bold mb-2 text-lg">
+                  📍 Delivery Address
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border-2 border-fire-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium shadow-md resize-none"
+                  placeholder="Enter your delivery address or use GPS..."
+                  rows={4}
+                  value={address}
+                  onChange={handleAddressChange}
+                  disabled={loading}
+                />
+                <p className="text-gray-500 text-sm mt-2">
+                  {locationData && locationData.latitude !== 0 ? (
+                    <span>📌 GPS: {locationData.latitude.toFixed(4)}, {locationData.longitude.toFixed(4)}</span>
+                  ) : (
+                    <span>💡 Click "Use My Location" to auto-fill with GPS</span>
+                  )}
+                </p>
+              </div>
+
+              <button 
+                className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={getCurrentLocation}
+                disabled={loading}
+              >
+                {loading ? '⏳ Getting Location...' : '📍 Use My Location'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Fixed Continue Button */}
-      {locationData && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-          <button 
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleContinue}
-            disabled={!locationData}
-          >
-            Continue →
-          </button>
-        </div>
-      )}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
+        <button 
+          className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleContinue}
+          disabled={!address.trim() || loading}
+        >
+          Continue →
+        </button>
+      </div>
     </div>
   )
 }
