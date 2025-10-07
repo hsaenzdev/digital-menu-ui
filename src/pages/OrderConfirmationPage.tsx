@@ -44,7 +44,7 @@ export const OrderConfirmationPage: React.FC = () => {
       const orderData = {
         customerPhone: customer.phoneNumber, // Still send to API (for WhatsApp customers)
         customerName: customer.name,
-        location: location.address || 'Unknown Location',
+        location: `${location.latitude},${location.longitude}`, // GPS coordinates
         address: location.address || 'Unknown Address',
         items: cart.items,
         subtotal: cart.subtotal,
