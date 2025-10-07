@@ -202,10 +202,6 @@ export const OrderStatusPage: React.FC = () => {
                 <span className="font-bold text-gray-900">{order.customerName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 font-medium">Phone:</span>
-                <span className="font-bold text-gray-900">{order.customerPhone}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Location:</span>
                 <span className="font-bold text-gray-900">{order.location}</span>
               </div>

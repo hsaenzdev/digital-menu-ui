@@ -1,7 +1,9 @@
 // Customer types
 export interface Customer {
   id?: string
-  phoneNumber: string
+  platform?: string // 'whatsapp' | 'messenger'
+  phoneNumber?: string // For WhatsApp customers only
+  messengerPsid?: string // For Messenger customers only
   name: string
   email?: string
   defaultAddress?: string

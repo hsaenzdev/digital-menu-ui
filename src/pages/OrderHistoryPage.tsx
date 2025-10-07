@@ -145,9 +145,6 @@ export const OrderHistoryPage: React.FC = () => {
             <span className="flex items-center gap-1 truncate">
               👤 <span className="truncate font-medium">{customer.name}</span>
             </span>
-            <span className="flex items-center gap-1 truncate">
-              📞 <span className="truncate font-medium">{customer.phoneNumber}</span>
-            </span>
           </div>
         )}
       </div>

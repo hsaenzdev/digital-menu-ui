@@ -24,7 +24,7 @@ export const OrderConfirmationPage: React.FC = () => {
 
   // Check if we have required data
   const hasCartItems = cart && cart.items && Array.isArray(cart.items) && cart.items.length > 0
-  const hasCustomerInfo = customer?.id && customer?.phoneNumber && customer?.name
+  const hasCustomerInfo = customer?.id && customer?.name
 
   const calculateTotal = () => {
     if (!hasCartItems) return 0
@@ -42,7 +42,7 @@ export const OrderConfirmationPage: React.FC = () => {
 
     try {
       const orderData = {
-        customerPhone: customer.phoneNumber,
+        customerPhone: customer.phoneNumber, // Still send to API (for WhatsApp customers)
         customerName: customer.name,
         location: location.address || 'Unknown Location',
         address: location.address || 'Unknown Address',
@@ -121,10 +121,6 @@ export const OrderConfirmationPage: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-green-700 font-medium">Customer:</span>
                     <span className="font-bold text-green-900">{customer?.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700 font-medium">Phone:</span>
-                    <span className="font-bold text-green-900">{customer?.phoneNumber}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-green-700 font-medium">Total:</span>
@@ -254,10 +250,6 @@ export const OrderConfirmationPage: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Name:</span>
                 <span className="font-bold text-gray-900">{customer.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 font-medium">Phone:</span>
-                <span className="font-bold text-gray-900">{customer.phoneNumber}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Location:</span>

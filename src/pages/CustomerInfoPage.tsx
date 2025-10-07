@@ -110,17 +110,6 @@ export const CustomerInfoPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Phone Number Display */}
-          {customer?.phoneNumber && (
-            <div className="bg-gradient-to-r from-fire-50 to-ember-50 border-2 border-fire-300 rounded-2xl p-4 mb-6 shadow-md">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">📱</span>
-                <span className="text-sm text-fire-800 font-bold">Phone:</span>
-                <span className="text-fire-900 font-medium">{customer.phoneNumber}</span>
-              </div>
-            </div>
-          )}
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
