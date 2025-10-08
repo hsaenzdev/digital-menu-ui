@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import type { LocationData } from '../types'
@@ -18,6 +18,9 @@ export const CustomerSetupPage: React.FC = () => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  // Ref to prevent duplicate geocoding calls (React StrictMode causes double mount)
+  const hasCalledGeolocation = useRef(false)
+
   // Pre-fill name if customer already has one
   useEffect(() => {
     if (customer?.name) {
@@ -25,9 +28,12 @@ export const CustomerSetupPage: React.FC = () => {
     }
   }, [customer])
 
-  // Auto-fetch location on mount
+  // Auto-fetch location on mount (only once)
   useEffect(() => {
-    getCurrentLocation()
+    if (!hasCalledGeolocation.current) {
+      hasCalledGeolocation.current = true
+      getCurrentLocation()
+    }
   }, [])
 
   const getCurrentLocation = async () => {
