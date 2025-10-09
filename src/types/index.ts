@@ -6,8 +6,6 @@ export interface Customer {
   messengerPsid?: string // For Messenger customers only
   name: string
   email?: string
-  defaultAddress?: string
-  defaultLocation?: string
   birthday?: Date
   isActive?: boolean
   createdAt?: Date

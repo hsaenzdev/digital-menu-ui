@@ -145,14 +145,12 @@ export const CustomerSetupPage: React.FC = () => {
       }
       finalLocation.address = address.trim()
 
-      // Update customer with name and location
+      // Update customer with name only (location will be captured at order time)
       const response = await fetch(`/api/customers/${customer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: name.trim(),
-          defaultAddress: finalLocation.address,
-          defaultLocation: `${finalLocation.latitude},${finalLocation.longitude}`
+          name: name.trim()
         })
       })
 
@@ -160,7 +158,7 @@ export const CustomerSetupPage: React.FC = () => {
         throw new Error('Failed to update customer')
       }
 
-      // Update context
+      // Update context with customer name and current location
       setCustomer({
         ...customer,
         name: name.trim()
