@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import { useCart } from '../context/CartContext'
@@ -13,6 +13,17 @@ export const CartPage: React.FC = () => {
   const [tipPercentage, setTipPercentage] = useState<number>(15)
   const [customTip, setCustomTip] = useState<string>('')
   const [showCustomTip, setShowCustomTip] = useState(false)
+  const hasInitializedTip = useRef(false)
+
+  // Apply default 15% tip on initial mount only
+  useEffect(() => {
+    if (cart.subtotal > 0 && !hasInitializedTip.current) {
+      hasInitializedTip.current = true
+      const tipAmount = (cart.subtotal * 15) / 100
+      updateTip(tipAmount)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {

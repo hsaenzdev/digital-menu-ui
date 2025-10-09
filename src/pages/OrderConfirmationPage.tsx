@@ -152,13 +152,6 @@ export const OrderConfirmationPage: React.FC = () => {
             >
               📚 View Order History
             </button>
-            
-            <button 
-              className="w-full bg-gray-100 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition-all shadow-md"
-              onClick={() => navigate('/menu')}
-            >
-              🛒 Continue Shopping
-            </button>
           </div>
         </div>
       </div>

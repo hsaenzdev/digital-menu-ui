@@ -34,9 +34,13 @@ export const CustomerSetupPage: React.FC = () => {
       hasCalledGeolocation.current = true
       getCurrentLocation()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getCurrentLocation = async () => {
+    // Prevent multiple rapid clicks
+    if (locationLoading) return
+    
     setLocationLoading(true)
     setLocationError('')
 
