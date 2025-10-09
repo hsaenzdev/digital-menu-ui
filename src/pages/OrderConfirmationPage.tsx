@@ -148,7 +148,7 @@ export const OrderConfirmationPage: React.FC = () => {
             
             <button 
               className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-              onClick={() => navigate('/order-history')}
+              onClick={() => navigate('/orders')}
             >
               📚 View Order History
             </button>
