@@ -16,6 +16,10 @@ export const ItemManager: React.FC = () => {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterAvailability, setFilterAvailability] = useState<string>('all')
+  const [filterDietary, setFilterDietary] = useState<string>('all')
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
+  const [bulkActionMode, setBulkActionMode] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>('')
   const { token } = useAuth()
@@ -277,6 +281,135 @@ export const ItemManager: React.FC = () => {
     }
   }
 
+  // Bulk selection handlers
+  const handleToggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      return newSet
+    })
+  }
+
+  const handleSelectAll = () => {
+    if (selectedItems.size === filteredItems.length) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(filteredItems.map(item => item.id)))
+    }
+  }
+
+  const handleBulkToggleAvailability = async () => {
+    try {
+      const promises = Array.from(selectedItems).map(itemId => {
+        const item = items.find(i => i.id === itemId)
+        if (!item) return Promise.resolve()
+        
+        return fetch(`${PUBLIC_API_URL}/menu-manager/items/${itemId}/availability`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ isAvailable: !item.isAvailable })
+        })
+      })
+
+      await Promise.all(promises)
+      
+      // Update state
+      setItems(prevItems =>
+        prevItems.map(item =>
+          selectedItems.has(item.id)
+            ? { ...item, isAvailable: !item.isAvailable }
+            : item
+        )
+      )
+      
+      setSelectedItems(new Set())
+      setBulkActionMode(false)
+    } catch {
+      setError('Failed to bulk toggle availability')
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedItems.size} items?`)) {
+      return
+    }
+
+    try {
+      const promises = Array.from(selectedItems).map(itemId =>
+        fetch(`${PUBLIC_API_URL}/menu-manager/items/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        })
+      )
+
+      await Promise.all(promises)
+      
+      // Update state - filter out deleted items
+      setItems(prevItems =>
+        prevItems.filter(item => !selectedItems.has(item.id))
+      )
+      
+      setSelectedItems(new Set())
+      setBulkActionMode(false)
+    } catch {
+      setError('Failed to bulk delete items')
+    }
+  }
+
+  const handleDuplicateItem = async (item: MenuItem) => {
+    try {
+      const duplicateData = {
+        categoryId: item.categoryId,
+        name: `${item.name} (Copy)`,
+        description: item.description,
+        price: item.price,
+        displayOrder: item.displayOrder || 0,
+        isAvailable: item.isAvailable,
+        isSpecial: item.isSpecial,
+        isVegetarian: item.isVegetarian,
+        isVegan: item.isVegan,
+        isGlutenFree: item.isGlutenFree,
+        isSpicy: item.isSpicy,
+        preparationTime: item.preparationTime,
+        calories: item.calories,
+        allergens: item.allergens
+      }
+
+      const response = await fetch(`${PUBLIC_API_URL}/menu-manager/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(duplicateData)
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        // Add new item to state
+        const newItem = {
+          ...data.item,
+          ...duplicateData
+        }
+        
+        setItems(prevItems => [...prevItems, newItem])
+      }
+    } catch {
+      setError('Failed to duplicate item')
+    }
+  }
+
   // Modal handlers
   const handleOpenModal = (item?: MenuItem) => {
     if (item) {
@@ -353,8 +486,39 @@ export const ItemManager: React.FC = () => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = filterCategory === 'all' || item.categoryId === filterCategory
     const isNotDeleted = item.isActive !== false // Hide deleted items
-    return matchesSearch && matchesCategory && isNotDeleted
+    
+    // Availability filter
+    const matchesAvailability = 
+      filterAvailability === 'all' ||
+      (filterAvailability === 'available' && item.isAvailable) ||
+      (filterAvailability === 'unavailable' && !item.isAvailable)
+    
+    // Dietary filter
+    const matchesDietary =
+      filterDietary === 'all' ||
+      (filterDietary === 'vegetarian' && item.isVegetarian) ||
+      (filterDietary === 'vegan' && item.isVegan) ||
+      (filterDietary === 'glutenFree' && item.isGlutenFree) ||
+      (filterDietary === 'spicy' && item.isSpicy) ||
+      (filterDietary === 'special' && item.isSpecial)
+    
+    return matchesSearch && matchesCategory && isNotDeleted && matchesAvailability && matchesDietary
   })
+
+  // Calculate statistics
+  const activeItems = (items || []).filter(item => item.isActive !== false)
+  const statistics = {
+    total: activeItems.length,
+    available: activeItems.filter(item => item.isAvailable).length,
+    unavailable: activeItems.filter(item => !item.isAvailable).length,
+    special: activeItems.filter(item => item.isSpecial).length,
+    vegetarian: activeItems.filter(item => item.isVegetarian).length,
+    vegan: activeItems.filter(item => item.isVegan).length,
+    byCategory: (categories || []).map(cat => ({
+      name: cat.name,
+      count: activeItems.filter(item => item.categoryId === cat.id).length
+    })).filter(cat => cat.count > 0)
+  }
 
   if (isLoading) {
     return (
@@ -386,31 +550,157 @@ export const ItemManager: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          placeholder="Search items..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-        />
-        <select
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="all">All Categories</option>
-          {(categories || []).map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
+      {/* Statistics Panel */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="bg-blue-50 rounded-lg p-4">
+          <p className="text-sm text-blue-600 font-medium">Total Items</p>
+          <p className="text-2xl font-bold text-blue-900">{statistics.total}</p>
+        </div>
+        <div className="bg-green-50 rounded-lg p-4">
+          <p className="text-sm text-green-600 font-medium">Available</p>
+          <p className="text-2xl font-bold text-green-900">{statistics.available}</p>
+        </div>
+        <div className="bg-orange-50 rounded-lg p-4">
+          <p className="text-sm text-orange-600 font-medium">Unavailable</p>
+          <p className="text-2xl font-bold text-orange-900">{statistics.unavailable}</p>
+        </div>
+        <div className="bg-yellow-50 rounded-lg p-4">
+          <p className="text-sm text-yellow-600 font-medium">Special</p>
+          <p className="text-2xl font-bold text-yellow-900">{statistics.special}</p>
+        </div>
+        <div className="bg-emerald-50 rounded-lg p-4">
+          <p className="text-sm text-emerald-600 font-medium">Vegetarian</p>
+          <p className="text-2xl font-bold text-emerald-900">{statistics.vegetarian}</p>
+        </div>
+        <div className="bg-teal-50 rounded-lg p-4">
+          <p className="text-sm text-teal-600 font-medium">Vegan</p>
+          <p className="text-2xl font-bold text-teal-900">{statistics.vegan}</p>
+        </div>
+      </div>
+
+      {/* Category Breakdown */}
+      {statistics.byCategory.length > 0 && (
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-sm font-medium text-gray-700 mb-3">Items by Category</p>
+          <div className="flex flex-wrap gap-2">
+            {statistics.byCategory.map((cat, idx) => (
+              <div key={idx} className="bg-white rounded-lg px-3 py-2 border border-gray-200">
+                <span className="text-sm font-medium text-gray-900">{cat.name}</span>
+                <span className="ml-2 text-sm text-gray-500">({cat.count})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filter controls */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          <input
+            type="text"
+            placeholder="Search items..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">All Categories</option>
+            {(categories || []).map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterAvailability}
+            onChange={(e) => setFilterAvailability(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">All Availability</option>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+          <select
+            value={filterDietary}
+            onChange={(e) => setFilterDietary(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">All Dietary</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="glutenFree">Gluten Free</option>
+            <option value="spicy">Spicy</option>
+            <option value="special">Special</option>
+          </select>
+        </div>
+
+      {/* Bulk Actions Toolbar */}
+      <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setBulkActionMode(!bulkActionMode)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              bulkActionMode 
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {bulkActionMode ? 'Cancel Selection' : 'Select Multiple'}
+          </button>
+          
+          {bulkActionMode && (
+            <>
+              <button
+                onClick={handleSelectAll}
+                className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50"
+              >
+                {selectedItems.size === filteredItems.length ? 'Deselect All' : 'Select All'}
+              </button>
+              
+              {selectedItems.size > 0 && (
+                <span className="text-sm text-gray-600">
+                  {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
+                </span>
+              )}
+            </>
+          )}
+        </div>
+
+        {bulkActionMode && selectedItems.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBulkToggleAvailability}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            >
+              Toggle Availability
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
+            >
+              Delete Selected
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Items Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
-          <div key={item.id} className={`bg-white rounded-lg border-2 overflow-hidden ${!item.isAvailable ? 'border-orange-300 bg-orange-50' : 'border-gray-200'}`}>
+          <div key={item.id} className={`bg-white rounded-lg border-2 overflow-hidden relative ${!item.isAvailable ? 'border-orange-300 bg-orange-50' : 'border-gray-200'}`}>
+            {bulkActionMode && (
+              <div className="absolute top-2 left-2 z-10">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.has(item.id)}
+                  onChange={() => handleToggleItemSelection(item.id)}
+                  className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                />
+              </div>
+            )}
             {item.imageUrl && (
               <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
             )}
@@ -464,14 +754,23 @@ export const ItemManager: React.FC = () => {
                   {item.isAvailable ? '✓ Available' : '✕ Unavailable'}
                 </button>
                 <button
+                  onClick={() => handleDuplicateItem(item)}
+                  className="px-3 py-1.5 text-purple-600 hover:bg-purple-50 rounded"
+                  title="Duplicate item"
+                >
+                  📋
+                </button>
+                <button
                   onClick={() => handleOpenModal(item)}
                   className="px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                  title="Edit item"
                 >
                   ✏️
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
                   className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded"
+                  title="Delete item"
                 >
                   🗑️
                 </button>
