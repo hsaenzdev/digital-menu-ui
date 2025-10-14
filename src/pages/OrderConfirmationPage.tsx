@@ -33,7 +33,7 @@ export const OrderConfirmationPage: React.FC = () => {
   }
 
   const handleSubmitOrder = async () => {
-    if (!hasCartItems || !hasCustomerInfo || !location) {
+    if (!hasCartItems || !hasCustomerInfo || !location || !customerId) {
       setError('Missing required information')
       return
     }
@@ -43,6 +43,7 @@ export const OrderConfirmationPage: React.FC = () => {
 
     try {
       const orderData = {
+        customerId, // Link order to customer
         customerPhone: customer.phoneNumber, // Still send to API (for WhatsApp customers)
         customerName: customer.name,
         location: `${location.latitude},${location.longitude}`, // GPS coordinates
