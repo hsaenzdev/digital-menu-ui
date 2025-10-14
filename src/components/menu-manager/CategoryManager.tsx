@@ -67,7 +67,28 @@ export const CategoryManager: React.FC = () => {
       const data = await response.json()
 
       if (data.success) {
-        fetchCategories()
+        // Update state directly
+        if (editingCategory) {
+          setCategories(prevCategories =>
+            prevCategories.map(cat =>
+              cat.id === editingCategory.id
+                ? { ...cat, ...formData, updatedAt: new Date().toISOString() }
+                : cat
+            )
+          )
+        } else {
+          const newCategory = {
+            ...data.category,
+            id: data.category.id,
+            name: formData.name,
+            description: formData.description || '',
+            displayOrder: formData.displayOrder || 0,
+            isActive: formData.isActive !== false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          setCategories(prevCategories => [...prevCategories, newCategory])
+        }
         handleCloseModal()
       } else {
         setError(data.error || 'Failed to save category')
@@ -92,7 +113,8 @@ export const CategoryManager: React.FC = () => {
       const data = await response.json()
 
       if (data.success) {
-        fetchCategories()
+        // Remove from state directly
+        setCategories(prevCategories => prevCategories.filter(cat => cat.id !== id))
       } else {
         setError(data.error || 'Failed to delete category')
       }

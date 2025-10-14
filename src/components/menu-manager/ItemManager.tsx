@@ -57,9 +57,6 @@ export const ItemManager: React.FC = () => {
         categoriesRes.json()
       ])
 
-      console.log('Items data:', itemsData)
-      console.log('Categories data:', categoriesData)
-
       if (itemsData.success) {
         setItems(itemsData.items)
       } else {
@@ -69,8 +66,7 @@ export const ItemManager: React.FC = () => {
       if (categoriesData.success) {
         setCategories(categoriesData.data)
       }
-    } catch (err) {
-      console.error('Error loading data:', err)
+    } catch {
       setError('Failed to load data')
     } finally {
       setIsLoading(false)
@@ -135,7 +131,42 @@ export const ItemManager: React.FC = () => {
 
       const data = await response.json()
       if (data.success) {
-        fetchData()
+        // Update state directly instead of refetching
+        if (editingItem) {
+          // Update existing item
+          setItems(prevItems => 
+            prevItems.map(item => 
+              item.id === editingItem.id 
+                ? { ...item, ...formData, imageUrl, updatedAt: new Date().toISOString() }
+                : item
+            )
+          )
+        } else {
+          // Add new item
+          const newItem = {
+            ...data.item,
+            id: data.item.id,
+            categoryId: formData.categoryId,
+            name: formData.name,
+            description: formData.description || '',
+            price: formData.price,
+            imageUrl: imageUrl || '',
+            displayOrder: formData.displayOrder || 0,
+            isAvailable: formData.isAvailable !== false,
+            isActive: true,
+            isSpecial: formData.isSpecial || false,
+            isVegetarian: formData.isVegetarian || false,
+            isVegan: formData.isVegan || false,
+            isGlutenFree: formData.isGlutenFree || false,
+            isSpicy: formData.isSpicy || false,
+            preparationTime: formData.preparationTime,
+            calories: formData.calories,
+            allergens: formData.allergens || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          setItems(prevItems => [...prevItems, newItem])
+        }
         handleCloseModal()
       }
     } catch {
@@ -148,11 +179,16 @@ export const ItemManager: React.FC = () => {
     if (!token || !confirm('Delete this item?')) return
 
     try {
-      await fetch(`${API_URL}/items/${id}`, {
+      const response = await fetch(`${API_URL}/items/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      fetchData()
+      
+      const data = await response.json()
+      if (data.success) {
+        // Remove item from state directly
+        setItems(prevItems => prevItems.filter(item => item.id !== id))
+      }
     } catch {
       setError('Failed to delete item')
     }
@@ -163,7 +199,7 @@ export const ItemManager: React.FC = () => {
     if (!token) return
 
     try {
-      await fetch(`${API_URL}/items/${id}/availability`, {
+      const response = await fetch(`${API_URL}/items/${id}/availability`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +207,18 @@ export const ItemManager: React.FC = () => {
         },
         body: JSON.stringify({ isAvailable: !isAvailable })
       })
-      fetchData()
+      
+      const data = await response.json()
+      if (data.success) {
+        // Update availability in state directly
+        setItems(prevItems =>
+          prevItems.map(item =>
+            item.id === id
+              ? { ...item, isAvailable: !isAvailable }
+              : item
+          )
+        )
+      }
     } catch {
       setError('Failed to toggle availability')
     }
