@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import type { Customer, LocationData } from '../types'
 
@@ -17,35 +17,10 @@ interface CustomerProviderProps {
 }
 
 export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) => {
-  const [customer, setCustomerState] = useState<Customer | null>(() => {
-    // Load from localStorage on initialization
-    const saved = localStorage.getItem('digital-menu-customer')
-    return saved ? JSON.parse(saved) : null
-  })
-  
-  const [location, setLocationState] = useState<LocationData | null>(() => {
-    // Load from localStorage on initialization
-    const saved = localStorage.getItem('digital-menu-location')
-    return saved ? JSON.parse(saved) : null
-  })
-
-  // Save to localStorage whenever customer changes
-  useEffect(() => {
-    if (customer) {
-      localStorage.setItem('digital-menu-customer', JSON.stringify(customer))
-    } else {
-      localStorage.removeItem('digital-menu-customer')
-    }
-  }, [customer])
-
-  // Save to localStorage whenever location changes
-  useEffect(() => {
-    if (location) {
-      localStorage.setItem('digital-menu-location', JSON.stringify(location))
-    } else {
-      localStorage.removeItem('digital-menu-location')
-    }
-  }, [location])
+  // In-memory only state - no localStorage persistence
+  // URL params (/:customerId) are now the source of truth
+  const [customer, setCustomerState] = useState<Customer | null>(null)
+  const [location, setLocationState] = useState<LocationData | null>(null)
 
   const setCustomer = useCallback((customer: Customer) => {
     setCustomerState(customer)
@@ -58,8 +33,7 @@ export const CustomerProvider: React.FC<CustomerProviderProps> = ({ children }) 
   const clearCustomer = useCallback(() => {
     setCustomerState(null)
     setLocationState(null)
-    localStorage.removeItem('digital-menu-customer')
-    localStorage.removeItem('digital-menu-location')
+    // No localStorage cleanup needed - state is in-memory only
   }, [])
 
   return (
