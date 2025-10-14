@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useCustomer } from '../context/CustomerContext'
@@ -12,18 +12,7 @@ export const OrderConfirmationPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
 
-  // Give time for contexts to load from localStorage
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Check if we have required data
   const hasCartItems = cart && cart.items && Array.isArray(cart.items) && cart.items.length > 0
   const hasCustomerInfo = customer?.id && customer?.name
 
@@ -79,27 +68,6 @@ export const OrderConfirmationPage: React.FC = () => {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Loading Order</h1>
-          <p className="text-fire-100 text-sm mt-1 text-center">Preparing your order confirmation...</p>
-        </div>
-        
-        {/* Loading Content */}
-        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-          <div className="text-center py-12">
-            <div className="text-7xl mb-4 animate-pulse">⏳</div>
-            <p className="text-gray-600 font-medium text-lg">Loading your order details...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Show success screen if order was submitted
   if (submittedOrder) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 overflow-hidden">
@@ -160,7 +128,6 @@ export const OrderConfirmationPage: React.FC = () => {
     )
   }
 
-  // Redirect if missing essential data
   if (!hasCartItems) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
