@@ -38,7 +38,6 @@ export const CustomerSetupPage: React.FC = () => {
   }, [])
 
   const getCurrentLocation = async () => {
-    // Prevent multiple rapid clicks
     if (locationLoading) return
     
     setLocationLoading(true)
@@ -55,48 +54,65 @@ export const CustomerSetupPage: React.FC = () => {
         const { latitude, longitude } = position.coords
         
         try {
-          // Call our backend geocoding endpoint
           const response = await fetch(
             `http://localhost:3000/api/geocoding/reverse?lat=${latitude}&lon=${longitude}`
           )
           
           if (response.ok) {
             const data = await response.json()
-            const geocodedAddress = data.address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
             
-            setAddress(geocodedAddress)
-            setLocationData({
-              latitude,
-              longitude,
-              address: geocodedAddress
-            })
+            if (data.success && data.address) {
+              setAddress(data.address)
+              setLocationData({
+                latitude,
+                longitude,
+                address: data.address
+              })
+              setLocationError('')
+            } else {
+              setLocationError(data.message || 'Could not get address. Please enter manually.')
+              setLocationData({
+                latitude,
+                longitude,
+                address: ''
+              })
+            }
           } else {
-            // Fallback to coordinates
-            const fallbackAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
-            setAddress(fallbackAddress)
+            setLocationError('Could not get address. Please enter manually.')
             setLocationData({
               latitude,
               longitude,
-              address: fallbackAddress
+              address: ''
             })
           }
           
           setLocationLoading(false)
-        } catch (err) {
-          console.error('Geocoding error:', err)
-          // Fallback to coordinates
-          const fallbackAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
-          setAddress(fallbackAddress)
+        } catch {
+          setLocationError('Could not get address. Please enter manually.')
           setLocationData({
             latitude,
             longitude,
-            address: fallbackAddress
+            address: ''
           })
           setLocationLoading(false)
         }
       },
       (error) => {
-        setLocationError(`Location error: ${error.message}`)
+        let errorMsg = 'Location access denied'
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = 'Location access denied. Please enter your address manually.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = 'Location unavailable. Please enter your address manually.'
+            break
+          case error.TIMEOUT:
+            errorMsg = 'Location request timed out. Please enter your address manually.'
+            break
+        }
+        
+        setLocationError(errorMsg)
         setLocationLoading(false)
       },
       {
@@ -141,15 +157,14 @@ export const CustomerSetupPage: React.FC = () => {
     setError('')
 
     try {
-      // Ensure we have location data
-      const finalLocation: LocationData = locationData || {
-        latitude: 0,
-        longitude: 0,
-        address: address.trim()
-      }
-      finalLocation.address = address.trim()
+      const finalLocation: LocationData = locationData && locationData.latitude !== 0 
+        ? { ...locationData, address: address.trim() }
+        : {
+            latitude: 0,
+            longitude: 0,
+            address: address.trim()
+          }
 
-      // Update customer with name only (location will be captured at order time)
       const response = await fetch(`/api/customers/${customer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -162,7 +177,6 @@ export const CustomerSetupPage: React.FC = () => {
         throw new Error('Failed to update customer')
       }
 
-      // Update context with customer name and current location
       setCustomer({
         ...customer,
         name: name.trim()
@@ -231,7 +245,7 @@ export const CustomerSetupPage: React.FC = () => {
                 </label>
               </div>
               {locationData && locationData.latitude !== 0 && (
-                <span className="text-xs text-gray-500">GPS ✓</span>
+                <span className="text-xs text-green-600 font-semibold bg-green-50 px-2 py-1 rounded-full">GPS ✓</span>
               )}
             </div>
 
@@ -244,8 +258,8 @@ export const CustomerSetupPage: React.FC = () => {
 
             <textarea
               className="w-full px-3 py-2.5 border-2 border-fire-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium resize-none text-base"
-              placeholder="Your delivery address..."
-              rows={2}
+              placeholder="Enter your street address (e.g., 123 Main St, Apt 4B)"
+              rows={3}
               value={address}
               onChange={handleAddressChange}
               disabled={locationLoading}
@@ -262,8 +276,14 @@ export const CustomerSetupPage: React.FC = () => {
             </button>
 
             {locationError && (
-              <div className="mt-2 bg-red-50 border border-red-300 rounded-lg p-2">
-                <p className="text-red-600 font-medium text-xs">⚠️ {locationError}</p>
+              <div className="mt-2 bg-amber-50 border border-amber-300 rounded-lg p-2">
+                <p className="text-amber-700 font-medium text-xs">💡 {locationError}</p>
+              </div>
+            )}
+            
+            {!address.trim() && !locationLoading && (
+              <div className="mt-2 bg-blue-50 border border-blue-300 rounded-lg p-2">
+                <p className="text-blue-700 font-medium text-xs">ℹ️ Click "Use My Location" or enter your address manually</p>
               </div>
             )}
           </div>
@@ -289,11 +309,20 @@ export const CustomerSetupPage: React.FC = () => {
           <button 
             type="submit"
             onClick={handleSubmit}
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-base py-3.5 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-base py-3.5 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             disabled={saving || !name.trim() || !address.trim() || locationLoading}
           >
-            {saving ? '⏳ Saving...' : 'Continue to Menu →'}
+            {saving ? '⏳ Saving...' : 
+             !name.trim() ? 'Enter Your Name ↑' :
+             !address.trim() ? 'Enter Delivery Address ↑' :
+             'Continue to Menu →'}
           </button>
+          
+          {(!name.trim() || !address.trim()) && !saving && (
+            <p className="text-xs text-center text-gray-600 -mt-1">
+              Please complete all fields above to continue
+            </p>
+          )}
         </div>
       </div>
     </div>
