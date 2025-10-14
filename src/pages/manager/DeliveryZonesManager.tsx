@@ -503,15 +503,6 @@ export const DeliveryZonesManager: React.FC = () => {
                 )}
               </div>
             )}
-            
-            {isDrawing && (
-              <div className="absolute top-4 left-4 right-4 z-[1000] bg-blue-100 border-2 border-blue-500 rounded-lg p-3">
-                <p className="font-medium text-blue-900">
-                  ✏️ Click on the map to add points. You have {drawingPoints.length} point{drawingPoints.length !== 1 ? 's' : ''}
-                  {drawingPoints.length < 3 && ' (minimum 3 required)'}
-                </p>
-              </div>
-            )}
 
             <MapContainer
               center={mapCenter}
@@ -605,87 +596,113 @@ export const DeliveryZonesManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Create Zone Modal */}
+        {/* Create Zone Sidebar - Fixed to right side, doesn't block map */}
         {showCreateModal && (
-          <div className="fixed inset-0 z-[2000] overflow-y-auto">
-            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleCancelDrawing} />
-            
-            <div className="flex min-h-full items-center justify-center p-4">
-              <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Create Delivery Zone</h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City *
-                    </label>
-                    <select
-                      value={newZoneData.cityId}
-                      onChange={(e) => setNewZoneData({ ...newZoneData, cityId: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      <option value="">Select a city</option>
-                      {cities.map(city => (
-                        <option key={city.id} value={city.id}>{city.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Zone Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={newZoneData.name}
-                      onChange={(e) => setNewZoneData({ ...newZoneData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., Downtown Area"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description (optional)
-                    </label>
-                    <textarea
-                      value={newZoneData.description}
-                      onChange={(e) => setNewZoneData({ ...newZoneData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      rows={2}
-                      placeholder="Brief description of the zone"
-                    />
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-900">
-                      Points drawn: {drawingPoints.length}
-                      {drawingPoints.length < 3 && ' (minimum 3 required)'}
+          <div className="fixed right-0 top-0 bottom-0 w-96 bg-white shadow-2xl z-[2000] border-l-4 border-indigo-500 overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Create Delivery Zone</h2>
+                <button
+                  onClick={handleCancelDrawing}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-blue-900 mb-2">
+                    ✏️ Drawing Mode Active
+                  </p>
+                  <p className="text-sm text-blue-800 mb-2">
+                    Click on the map to add points to your delivery zone polygon.
+                  </p>
+                  <div className="bg-white rounded px-3 py-2 border border-blue-300">
+                    <p className="text-lg font-bold text-blue-900">
+                      {drawingPoints.length} point{drawingPoints.length !== 1 ? 's' : ''} drawn
                     </p>
+                    {drawingPoints.length < 3 && (
+                      <p className="text-xs text-blue-700 mt-1">
+                        Minimum 3 points required
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex gap-3 mt-6">
-                  <button
-                    onClick={handleCreateZone}
-                    disabled={!newZoneData.cityId || !newZoneData.name || drawingPoints.length < 3}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium ${
-                      !newZoneData.cityId || !newZoneData.name || drawingPoints.length < 3
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City *
+                  </label>
+                  <select
+                    value={newZoneData.cityId}
+                    onChange={(e) => setNewZoneData({ ...newZoneData, cityId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
                   >
-                    ✓ Create Zone
-                  </button>
-                  <button
-                    onClick={handleCancelDrawing}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700"
-                  >
-                    ✕ Cancel
-                  </button>
+                    <option value="">Select a city</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Zone Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newZoneData.name}
+                    onChange={(e) => setNewZoneData({ ...newZoneData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., Downtown Area"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    value={newZoneData.description}
+                    onChange={(e) => setNewZoneData({ ...newZoneData, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="Brief description of the zone"
+                  />
+                </div>
+
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <p className="text-xs text-gray-600 mb-2">💡 Tips:</p>
+                  <ul className="text-xs text-gray-700 space-y-1">
+                    <li>• Zoom in for precision</li>
+                    <li>• Click around the boundary</li>
+                    <li>• 3+ points needed</li>
+                    <li>• Auto-closes polygon</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 mt-6 pt-6 border-t">
+                <button
+                  onClick={handleCreateZone}
+                  disabled={!newZoneData.cityId || !newZoneData.name || drawingPoints.length < 3}
+                  className={`w-full px-4 py-3 rounded-lg font-medium ${
+                    !newZoneData.cityId || !newZoneData.name || drawingPoints.length < 3
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  ✓ Create Zone ({drawingPoints.length} points)
+                </button>
+                <button
+                  onClick={handleCancelDrawing}
+                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                >
+                  ✕ Cancel Drawing
+                </button>
               </div>
             </div>
           </div>
