@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import type { Category, MenuItem, MenuItemFormData } from '../../types/menu-manager'
+import type { Category, MenuItem, MenuItemFormData, ModifierGroup } from '../../types/menu-manager'
 
 const API_URL = '/api/menu-manager'
 const PUBLIC_API_URL = '/api/menu'
@@ -8,6 +8,8 @@ const PUBLIC_API_URL = '/api/menu'
 export const ItemManager: React.FC = () => {
   const [items, setItems] = useState<MenuItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [modifierGroups, setModifierGroups] = useState<ModifierGroup[]>([])
+  const [selectedModifierGroups, setSelectedModifierGroups] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -47,14 +49,16 @@ export const ItemManager: React.FC = () => {
       setError(null)
       setIsLoading(true)
       
-      const [itemsRes, categoriesRes] = await Promise.all([
+      const [itemsRes, categoriesRes, modifierGroupsRes] = await Promise.all([
         fetch(`${API_URL}/items`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${PUBLIC_API_URL}/categories`)
+        fetch(`${PUBLIC_API_URL}/categories`),
+        fetch(`${API_URL}/modifier-groups`, { headers: { 'Authorization': `Bearer ${token}` } })
       ])
 
-      const [itemsData, categoriesData] = await Promise.all([
+      const [itemsData, categoriesData, modifierGroupsData] = await Promise.all([
         itemsRes.json(),
-        categoriesRes.json()
+        categoriesRes.json(),
+        modifierGroupsRes.json()
       ])
 
       if (itemsData.success) {
@@ -65,6 +69,10 @@ export const ItemManager: React.FC = () => {
       
       if (categoriesData.success) {
         setCategories(categoriesData.data)
+      }
+      
+      if (modifierGroupsData.success) {
+        setModifierGroups(modifierGroupsData.groups)
       }
     } catch {
       setError('Failed to load data')
@@ -102,6 +110,44 @@ export const ItemManager: React.FC = () => {
     return null
   }
 
+  // Update modifier group associations
+  const updateModifierGroups = async (itemId: string) => {
+    if (!token) return
+
+    try {
+      // Get current modifier groups for this item
+      const currentGroups = editingItem?.modifierGroups?.map(mg => mg.modifierGroupId) || []
+      
+      // Find groups to add (in selectedModifierGroups but not in currentGroups)
+      const groupsToAdd = selectedModifierGroups.filter(id => !currentGroups.includes(id))
+      
+      // Find groups to remove (in currentGroups but not in selectedModifierGroups)
+      const groupsToRemove = currentGroups.filter(id => !selectedModifierGroups.includes(id))
+      
+      // Link new modifier groups
+      for (const groupId of groupsToAdd) {
+        await fetch(`${API_URL}/items/${itemId}/modifier-groups`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ modifierGroupId: groupId })
+        })
+      }
+      
+      // Unlink removed modifier groups
+      for (const groupId of groupsToRemove) {
+        await fetch(`${API_URL}/items/${itemId}/modifier-groups/${groupId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      }
+    } catch {
+      setError('Failed to update modifier groups')
+    }
+  }
+
   // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -131,6 +177,13 @@ export const ItemManager: React.FC = () => {
 
       const data = await response.json()
       if (data.success) {
+        const itemId = editingItem?.id || data.item?.id
+        
+        // Update modifier group associations
+        if (itemId) {
+          await updateModifierGroups(itemId)
+        }
+        
         // Update state directly instead of refetching
         if (editingItem) {
           // Update existing item
@@ -246,6 +299,9 @@ export const ItemManager: React.FC = () => {
         allergens: item.allergens || ''
       })
       setImagePreview(item.imageUrl || '')
+      // Set selected modifier groups
+      const existingGroups = item.modifierGroups?.map(mg => mg.modifierGroupId) || []
+      setSelectedModifierGroups(existingGroups)
     } else {
       setEditingItem(null)
       setFormData({
@@ -266,6 +322,7 @@ export const ItemManager: React.FC = () => {
         allergens: ''
       })
       setImagePreview('')
+      setSelectedModifierGroups([])
     }
     setImageFile(null)
     setIsModalOpen(true)
@@ -276,6 +333,7 @@ export const ItemManager: React.FC = () => {
     setEditingItem(null)
     setImageFile(null)
     setImagePreview('')
+    setSelectedModifierGroups([])
   }
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -378,6 +436,20 @@ export const ItemManager: React.FC = () => {
                 {item.isGlutenFree && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">GF</span>}
                 {item.isSpicy && <span className="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">🌶️ Spicy</span>}
               </div>
+
+              {/* Modifier Groups */}
+              {item.modifierGroups && item.modifierGroups.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 mb-1">Modifiers:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {item.modifierGroups.map(mg => (
+                      <span key={mg.id} className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
+                        ➕ {mg.modifierGroup?.name || 'Unknown'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex space-x-2 pt-2 border-t">
@@ -523,6 +595,34 @@ export const ItemManager: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : undefined })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
+                </div>
+              </div>
+
+              {/* Modifier Groups */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Modifier Groups</label>
+                <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
+                  {modifierGroups.length > 0 ? (
+                    modifierGroups.map((group) => (
+                      <label key={group.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedModifierGroups.includes(group.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedModifierGroups([...selectedModifierGroups, group.id])
+                            } else {
+                              setSelectedModifierGroups(selectedModifierGroups.filter(id => id !== group.id))
+                            }
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{group.name}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">No modifier groups available</p>
+                  )}
                 </div>
               </div>
 
