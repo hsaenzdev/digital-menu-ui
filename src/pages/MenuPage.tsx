@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import { useCart } from '../context/CartContext'
 import { useActiveOrders } from '../hooks/useActiveOrders'
@@ -8,6 +8,7 @@ import type { MenuCategory, MenuItem, CartItem, ApiResponse, SelectedModifier } 
 
 export const MenuPage: React.FC = () => {
   const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
   const { customer, location } = useCustomer()
   const { addItem, getItemCount } = useCart()
   const { hasActiveOrders, activeOrders } = useActiveOrders()
@@ -128,7 +129,7 @@ export const MenuPage: React.FC = () => {
   }
 
   const goToCart = () => {
-    navigate('/cart')
+    navigate(`/${customerId}/cart`)
   }
 
   return (
@@ -138,7 +139,7 @@ export const MenuPage: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button 
             className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate('/customer-info')}
+            onClick={() => navigate(`/${customerId}/setup`)}
           >
             <span className="text-xl">←</span>
             <span className="hidden sm:inline">Back</span>
@@ -186,7 +187,7 @@ export const MenuPage: React.FC = () => {
                   </div>
                   <button 
                     className="bg-fire-500 text-white font-medium px-4 py-2 rounded-lg hover:bg-fire-600 transition-colors text-sm whitespace-nowrap"
-                    onClick={() => navigate('/orders')}
+                    onClick={() => navigate(`/${customerId}/orders`)}
                   >
                     View Orders
                   </button>

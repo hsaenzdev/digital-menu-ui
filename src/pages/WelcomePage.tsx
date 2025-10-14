@@ -105,7 +105,7 @@ export const WelcomePage: React.FC = () => {
   }, [loading, error, setLocation])
 
   const handleStartOrder = () => {
-    navigate('/setup')
+    navigate(`/${customerId}/setup`)
   }
 
   const handleRetryLocation = () => {

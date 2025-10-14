@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useCustomer } from '../context/CustomerContext'
 import type { Order } from '../types'
 
 export const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
   const { cart, clearCart } = useCart()
   const { customer, location } = useCustomer()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -141,14 +142,14 @@ export const OrderConfirmationPage: React.FC = () => {
           <div className="space-y-2">
             <button 
               className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate(`/order-status/${submittedOrder?.id}`)}
+              onClick={() => navigate(`/${customerId}/order-status/${submittedOrder?.id}`)}
             >
               📋 View Order Status
             </button>
             
             <button 
               className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-              onClick={() => navigate('/orders')}
+              onClick={() => navigate(`/${customerId}/orders`)}
             >
               📚 View Order History
             </button>
@@ -176,7 +177,7 @@ export const OrderConfirmationPage: React.FC = () => {
             <p className="text-gray-600 mb-6 text-lg">Your cart is empty. Please add some items before proceeding.</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate('/menu')}
+              onClick={() => navigate(`/${customerId}/menu`)}
             >
               Browse Menu
             </button>
@@ -203,7 +204,7 @@ export const OrderConfirmationPage: React.FC = () => {
             <p className="text-gray-600 mb-6 text-lg">Please provide your information to proceed with the order.</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate('/customer-info')}
+              onClick={() => navigate(`/${customerId}/setup`)}
             >
               Enter Customer Info
             </button>
@@ -220,7 +221,7 @@ export const OrderConfirmationPage: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button 
             className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate('/cart')}
+            onClick={() => navigate(`/${customerId}/cart`)}
           >
             <span className="text-xl">←</span>
             <span>Back</span>
@@ -337,7 +338,7 @@ export const OrderConfirmationPage: React.FC = () => {
         <div className="space-y-2">
           <button 
             className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-            onClick={() => navigate('/cart')}
+            onClick={() => navigate(`/${customerId}/cart`)}
             disabled={isSubmitting}
           >
             Back to Cart

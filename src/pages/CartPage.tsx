@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import { useCart } from '../context/CartContext'
 import { useActiveOrders } from '../hooks/useActiveOrders'
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
   const { customer, location } = useCustomer()
   const { cart, updateItem, removeItem, clearCart, updateTip } = useCart()
   const { hasActiveOrders } = useActiveOrders()
@@ -52,11 +53,11 @@ export const CartPage: React.FC = () => {
     if (cart.items.length === 0) {
       return
     }
-    navigate('/order-confirmation')
+    navigate(`/${customerId}/order-confirmation`)
   }
 
   const handleContinueShopping = () => {
-    navigate('/menu')
+    navigate(`/${customerId}/menu`)
   }
 
   const handleClearCart = () => {
@@ -72,7 +73,7 @@ export const CartPage: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button 
             className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate(`/${customerId}/menu`)}
           >
             <span className="text-xl">←</span>
             <span className="hidden sm:inline">Back to Menu</span>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import type { Order, ApiResponse } from '../types'
 
 export const OrderHistoryPage: React.FC = () => {
   const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
   const { customer } = useCustomer()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,7 +113,7 @@ export const OrderHistoryPage: React.FC = () => {
             <p className="text-gray-600 mb-6 text-lg font-medium">{error}</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate('/menu')}
+              onClick={() => navigate(`/${customerId}/menu`)}
             >
               Browse Menu
             </button>
@@ -129,7 +130,7 @@ export const OrderHistoryPage: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button 
             className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate(`/${customerId}/menu`)}
           >
             <span className="text-xl">←</span>
             <span>Back</span>
@@ -160,7 +161,7 @@ export const OrderHistoryPage: React.FC = () => {
               <p className="text-gray-600 mb-6 text-lg">You haven't placed any orders. Start browsing our menu!</p>
               <button 
                 className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-                onClick={() => navigate('/menu')}
+                onClick={() => navigate(`/${customerId}/menu`)}
               >
                 Browse Menu
               </button>
@@ -189,7 +190,7 @@ export const OrderHistoryPage: React.FC = () => {
                     
                     <button 
                       className="ml-4 bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md transform active:scale-95"
-                      onClick={() => navigate(`/order-status/${order.id}`)}
+                      onClick={() => navigate(`/${customerId}/order-status/${order.id}`)}
                     >
                       View Details
                     </button>
@@ -221,7 +222,7 @@ export const OrderHistoryPage: React.FC = () => {
                   <div className="flex gap-2 mt-4">
                     <button 
                       className="flex-1 bg-white text-fire-600 border-2 border-fire-500 text-sm font-bold px-4 py-2 rounded-lg hover:bg-fire-50 transition-all shadow-md"
-                      onClick={() => navigate(`/order-status/${order.id}`)}
+                      onClick={() => navigate(`/${customerId}/order-status/${order.id}`)}
                     >
                       📋 View Status
                     </button>
@@ -229,7 +230,7 @@ export const OrderHistoryPage: React.FC = () => {
                     {order.status === 'delivered' && (
                       <button 
                         className="flex-1 bg-gradient-to-r from-fire-500 to-ember-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:from-fire-600 hover:to-ember-600 transition-all shadow-md transform active:scale-95"
-                        onClick={() => navigate('/menu')}
+                        onClick={() => navigate(`/${customerId}/menu`)}
                       >
                         🔄 Reorder
                       </button>
@@ -246,7 +247,7 @@ export const OrderHistoryPage: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
         <button 
           className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-          onClick={() => navigate('/menu')}
+          onClick={() => navigate(`/${customerId}/menu`)}
         >
           Browse Menu
         </button>

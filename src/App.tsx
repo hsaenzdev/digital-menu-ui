@@ -10,6 +10,7 @@ import { CartProvider } from './context/CartContext'
 import { CustomerProvider } from './context/CustomerContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/manager/ProtectedRoute'
+import { CustomerGuard } from './components/CustomerGuard'
 
 // Manager Pages
 import { ManagerDashboard } from './pages/manager/ManagerDashboard'
@@ -39,17 +40,47 @@ function App() {
                 <Route path="/manager/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
                 <Route path="/manager/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-                {/* Customer Routes */}
-                <Route path="/:customerId" element={<WelcomePage />} />
-                <Route path="/setup" element={<CustomerSetupPage />} />
-                <Route path="/menu" element={<MenuPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-                <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
-                <Route path="/orders" element={<OrderHistoryPage />} />
+                {/* Customer Routes - All include customerId */}
+                <Route path="/:customerId" element={<CustomerGuard><WelcomePage /></CustomerGuard>} />
+                <Route path="/:customerId/setup" element={<CustomerGuard><CustomerSetupPage /></CustomerGuard>} />
+                <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
+                <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
+                <Route path="/:customerId/order-confirmation" element={<CustomerGuard><OrderConfirmationPage /></CustomerGuard>} />
+                <Route path="/:customerId/order-status/:orderId" element={<CustomerGuard><OrderStatusPage /></CustomerGuard>} />
+                <Route path="/:customerId/orders" element={<CustomerGuard><OrderHistoryPage /></CustomerGuard>} />
                 
-                {/* Fallback for root path */}
-                <Route path="/" element={<WelcomePage />} />
+                {/* Catch-all for invalid routes - show error */}
+                <Route path="*" element={
+                  <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center max-w-md">
+                        <div className="text-8xl mb-6">🔗</div>
+                        <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+                          Invalid Link
+                        </h2>
+                        <p className="text-white/90 text-lg mb-6 drop-shadow">
+                          This link is not valid. Please use the personalized link sent to you.
+                        </p>
+                        
+                        <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+                          <p className="text-white/80 text-sm mb-2">
+                            <span className="font-semibold">How to order:</span>
+                          </p>
+                          <ol className="text-white/70 text-xs text-left space-y-1">
+                            <li>1. Contact us via WhatsApp or Messenger</li>
+                            <li>2. Receive your personalized order link</li>
+                            <li>3. Click the link to start ordering</li>
+                          </ol>
+                        </div>
+
+                        <div className="text-white/80 text-sm">
+                          <p className="mb-2">📞 Contact us:</p>
+                          <p className="text-white/60 text-xs">(555) 123-4567</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                } />
               </Routes>
             </div>
           </AuthProvider>

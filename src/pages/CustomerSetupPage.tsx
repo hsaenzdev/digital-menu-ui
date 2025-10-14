@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import type { LocationData } from '../types'
 
 export const CustomerSetupPage: React.FC = () => {
   const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
   const { customer, setCustomer, setLocation } = useCustomer()
   
   // Location state
@@ -183,7 +184,7 @@ export const CustomerSetupPage: React.FC = () => {
       })
       setLocation(finalLocation)
 
-      navigate('/menu')
+      navigate(`/${customerId}/menu`)
     } catch {
       setError('Failed to save information. Please try again.')
     } finally {

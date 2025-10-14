@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import type { Order } from '../types'
 
 export const OrderStatusPage: React.FC = () => {
-  const { orderId } = useParams<{ orderId: string }>()
+  const { orderId, customerId } = useParams<{ orderId: string; customerId: string }>()
   const navigate = useNavigate()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
@@ -134,7 +134,7 @@ export const OrderStatusPage: React.FC = () => {
             <p className="text-gray-600 mb-6 text-lg font-medium">{error || 'Could not find your order'}</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate(`/${customerId}`)}
             >
               Return Home
             </button>
@@ -151,7 +151,7 @@ export const OrderStatusPage: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button 
             className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate(`/${customerId}/menu`)}
           >
             <span className="text-xl">←</span>
             <span>Back</span>
@@ -310,14 +310,14 @@ export const OrderStatusPage: React.FC = () => {
         <div className="space-y-2">
           <button 
             className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-            onClick={() => navigate('/orders')}
+            onClick={() => navigate(`/${customerId}/orders`)}
           >
             View Order History
           </button>
           
           <button 
             className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate(`/${customerId}/menu`)}
           >
             Order Again
           </button>
