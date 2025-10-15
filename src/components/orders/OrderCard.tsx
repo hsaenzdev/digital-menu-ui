@@ -32,7 +32,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <span className="text-2xl">{getPlatformIcon(order.platform)}</span>
+          <span className="text-2xl">{getPlatformIcon(order.customer?.platform || 'whatsapp')}</span>
           <div>
             <h3 className="font-bold text-lg text-gray-900">
               #{order.orderNumber}
@@ -46,10 +46,13 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
       {/* Customer Info */}
       <div className="mb-3">
         <p className="text-sm font-medium text-gray-900">
-          {order.customerName || 'Guest'}
+          {order.customer?.name || 'Guest'}
         </p>
-        {order.customerPhone && (
-          <p className="text-xs text-gray-600">{order.customerPhone}</p>
+        {order.customer?.whatsappNumber && (
+          <p className="text-xs text-gray-600">{order.customer.whatsappNumber}</p>
+        )}
+        {order.customer?.messengerPsid && (
+          <p className="text-xs text-gray-600">Messenger User</p>
         )}
       </div>
 

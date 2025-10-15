@@ -78,10 +78,13 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Customer</h3>
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="font-medium text-gray-900">{order.customerName || 'Guest'}</p>
-                <p className="text-sm text-gray-600 mt-1">{getPlatformIcon(order.platform)}</p>
-                {order.customerPhone && (
-                  <p className="text-sm text-gray-600 mt-1">📞 {order.customerPhone}</p>
+                <p className="font-medium text-gray-900">{order.customer?.name || 'Guest'}</p>
+                <p className="text-sm text-gray-600 mt-1">{getPlatformIcon(order.customer?.platform || 'whatsapp')}</p>
+                {order.customer?.whatsappNumber && (
+                  <p className="text-sm text-gray-600 mt-1">📞 {order.customer.whatsappNumber}</p>
+                )}
+                {order.customer?.messengerPsid && (
+                  <p className="text-sm text-gray-600 mt-1">💬 Messenger User</p>
                 )}
                 {order.address && (
                   <p className="text-sm text-gray-600 mt-1">📍 {order.address}</p>

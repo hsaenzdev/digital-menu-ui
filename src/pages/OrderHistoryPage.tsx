@@ -183,7 +183,7 @@ export const OrderHistoryPage: React.FC = () => {
                       
                       <div className="text-sm text-gray-600 space-y-1 font-medium">
                         <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
-                        <div>📍 {order.location}</div>
+                        <div>📍 {order.address}</div>
                         <div className="font-bold text-fire-600">💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
                       </div>
                     </div>

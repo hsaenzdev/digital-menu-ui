@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 interface Customer {
   id: string
   platform: string
-  phoneNumber?: string
+  whatsappNumber?: string
   messengerPsid?: string
   name?: string
   email?: string
@@ -68,7 +68,7 @@ export const CustomersManager: React.FC = () => {
     if (searchTerm) {
       filtered = filtered.filter(customer => 
         customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.phoneNumber?.includes(searchTerm) ||
+        customer.whatsappNumber?.includes(searchTerm) ||
         customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
@@ -349,7 +349,7 @@ export const CustomersManager: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {customer.phoneNumber || customer.messengerPsid?.substring(0, 12) + '...'}
+                        {customer.whatsappNumber || customer.messengerPsid?.substring(0, 12) + '...'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
@@ -511,7 +511,7 @@ export const CustomersManager: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
                         <p className="text-gray-900">
-                          {selectedCustomer.phoneNumber || selectedCustomer.messengerPsid}
+                          {selectedCustomer.whatsappNumber || selectedCustomer.messengerPsid}
                         </p>
                       </div>
                       <div>

@@ -2,7 +2,7 @@
 export interface Customer {
   id?: string
   platform?: string // 'whatsapp' | 'messenger'
-  phoneNumber?: string // For WhatsApp customers only
+  whatsappNumber?: string // For WhatsApp customers only
   messengerPsid?: string // For Messenger customers only
   name: string
   email?: string
@@ -10,11 +10,6 @@ export interface Customer {
   isActive?: boolean
   createdAt?: Date
   updatedAt?: Date
-  // Legacy fields for compatibility
-  phone?: string
-  location?: string
-  address?: string
-  isBlocked?: boolean
 }
 
 // Menu types
@@ -94,13 +89,12 @@ export interface Cart {
   total: number
 }
 
-// Order types
+// Order types (customer-facing)
 export interface Order {
   id: string
   orderNumber: number
-  customerPhone: string
-  customerName: string
-  location: string
+  customerId: string
+  customer?: Customer // Customer data (optional for backwards compatibility)
   address: string
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
   subtotal: number

@@ -199,11 +199,7 @@ export const OrderStatusPage: React.FC = () => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Customer:</span>
-                <span className="font-bold text-gray-900">{order.customerName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 font-medium">Location:</span>
-                <span className="font-bold text-gray-900">{order.location}</span>
+                <span className="font-bold text-gray-900">{order.customer?.name || 'Guest'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Address:</span>
