@@ -100,17 +100,16 @@ export const OrderStatusPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Status</h1>
-          <p className="text-fire-100 text-sm mt-1 text-center">Loading your order...</p>
+        {/* Header - Consistent */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+          <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Status</h1>
         </div>
         
         {/* Loading Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-          <div className="text-center py-12">
-            <div className="text-7xl mb-4 animate-pulse">⏳</div>
-            <p className="text-gray-600 font-medium text-lg">Loading your order details...</p>
+          <div className="text-center py-8">
+            <div className="text-5xl mb-3 animate-pulse">⏳</div>
+            <p className="text-gray-600 font-medium text-sm">Loading your order details...</p>
           </div>
         </div>
       </div>
@@ -120,20 +119,28 @@ export const OrderStatusPage: React.FC = () => {
   if (error || !order) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Status</h1>
-          <p className="text-fire-100 text-sm mt-1 text-center">Order not found</p>
+        {/* Header - Consistent */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+          <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Status</h1>
         </div>
+
+        {/* Floating Home Button */}
+        <button
+          onClick={() => navigate(`/${customerId}`)}
+          className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+          title="Back to Home"
+        >
+          🏠
+        </button>
         
         {/* Error Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-          <div className="text-center py-12 px-4">
-            <div className="text-8xl mb-4">🔍</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Order Not Found</h3>
-            <p className="text-gray-600 mb-6 text-lg font-medium">{error || 'Could not find your order'}</p>
+          <div className="text-center py-8 px-3">
+            <div className="text-5xl mb-3">🔍</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Order Not Found</h3>
+            <p className="text-gray-600 mb-4 text-sm font-medium">{error || 'Could not find your order'}</p>
             <button 
-              className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+              className="bg-gradient-to-r from-fire-600 to-ember-600 text-white font-semibold text-sm py-2.5 px-6 rounded-lg hover:from-fire-700 hover:to-ember-700 transition-all shadow-lg"
               onClick={() => navigate(`/${customerId}`)}
             >
               Return Home
@@ -146,37 +153,43 @@ export const OrderStatusPage: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-      {/* Fixed Header */}
-      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">📋 Order Status</h1>
-          <p className="text-fire-100 text-sm mt-1">Order #{order.orderNumber}</p>
-        </div>
+      {/* Header - Consistent */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+        <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order #{order.orderNumber}</h1>
       </div>
+
+      {/* Floating Home Button */}
+      <button
+        onClick={() => navigate(`/${customerId}`)}
+        className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+        title="Back to Home"
+      >
+        🏠
+      </button>
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
-        <div className="p-4 pb-40 space-y-6">
+        <div className="p-3 pb-28 space-y-3">
 
-          {/* Current Status */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 text-center border-2 border-fire-200">
-            <div className="text-7xl mb-4" style={{ color: getStatusColor(order.status) }}>
+          {/* Current Status - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-4 text-center border border-fire-200">
+            <div className="text-5xl mb-2" style={{ color: getStatusColor(order.status) }}>
               {getStatusIcon(order.status)}
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2 capitalize">{order.status}</h2>
-            <p className="text-gray-600 mb-4 font-medium">{getStatusMessage(order.status)}</p>
+            <h2 className="text-lg font-bold text-gray-900 mb-1.5 capitalize">{order.status}</h2>
+            <p className="text-gray-600 mb-3 font-medium text-sm">{getStatusMessage(order.status)}</p>
             
-            {/* Status Progress */}
-            <div className="flex justify-center items-center gap-2 text-sm text-gray-500 mb-2">
-              <div className={`w-3 h-3 rounded-full ${['confirmed', 'preparing', 'ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <div className="w-8 h-0.5 bg-gray-300"></div>
-              <div className={`w-3 h-3 rounded-full ${['preparing', 'ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <div className="w-8 h-0.5 bg-gray-300"></div>
-              <div className={`w-3 h-3 rounded-full ${['ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-              <div className="w-8 h-0.5 bg-gray-300"></div>
-              <div className={`w-3 h-3 rounded-full ${order.status === 'delivered' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+            {/* Status Progress - Compact */}
+            <div className="flex justify-center items-center gap-1.5 text-xs text-gray-500 mb-1.5">
+              <div className={`w-2.5 h-2.5 rounded-full ${['confirmed', 'preparing', 'ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <div className="w-6 h-0.5 bg-gray-300"></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${['preparing', 'ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <div className="w-6 h-0.5 bg-gray-300"></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${['ready', 'delivered'].includes(order.status) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <div className="w-6 h-0.5 bg-gray-300"></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${order.status === 'delivered' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
             </div>
-            <div className="flex justify-between text-xs text-gray-500 font-medium px-2">
+            <div className="flex justify-between text-xs text-gray-500 font-medium px-1">
               <span>Confirmed</span>
               <span>Preparing</span>
               <span>Ready</span>
@@ -184,42 +197,42 @@ export const OrderStatusPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Order Details */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Order Details</h3>
+          {/* Order Details - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Order Details</h3>
             
-            <div className="space-y-3 text-sm">
+            <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Customer:</span>
                 <span className="font-bold text-gray-900">{order.customer?.name || 'Guest'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Address:</span>
-                <span className="font-bold text-gray-900">{order.customerLocation?.address || 'Address not available'}</span>
+                <span className="font-bold text-gray-900 truncate ml-2">{order.customerLocation?.address || 'Address not available'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Order Time:</span>
-                <span className="font-bold text-gray-900">
+                <span className="font-bold text-gray-900 text-xs">
                   {new Date(order.createdAt).toLocaleString()}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Order Items */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Items ({order.items.length})</h3>
+          {/* Order Items - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Items ({order.items.length})</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               {order.items.map((item, index) => (
-                <div key={index} className="flex justify-between items-start p-4 bg-gradient-to-r from-fire-50 to-ember-50 rounded-xl border border-fire-200">
+                <div key={index} className="flex justify-between items-start p-2.5 bg-gradient-to-r from-fire-50 to-ember-50 rounded-lg border border-fire-200">
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900">{item.itemName}</h4>
-                    <p className="text-sm text-gray-600 font-medium">Quantity: {item.quantity}</p>
+                    <h4 className="font-bold text-gray-900 text-sm">{item.itemName}</h4>
+                    <p className="text-xs text-gray-600 font-medium">Quantity: {item.quantity}</p>
                     
                     {/* Modifiers */}
                     {item.selectedModifiers && item.selectedModifiers.length > 0 && (
-                      <div className="mt-2 space-y-1">
+                      <div className="mt-1.5 space-y-0.5">
                         {item.selectedModifiers.map((modifier, idx) => (
                           <div key={idx} className="text-xs text-gray-600">
                             <span className="font-bold">{modifier.modifierName}:</span>
@@ -235,25 +248,25 @@ export const OrderStatusPage: React.FC = () => {
                     
                     {/* Special Notes */}
                     {item.specialNotes && (
-                      <div className="mt-2 text-sm text-fire-800 bg-amber-50 p-2 rounded border-l-4 border-fire-400">
+                      <div className="mt-1.5 text-xs text-fire-800 bg-amber-50 p-1.5 rounded border-l-2 border-fire-400">
                         <span className="font-bold">Note:</span> {item.specialNotes}
                       </div>
                     )}
                   </div>
                   
-                  <div className="text-right ml-4">
-                    <div className="font-bold text-fire-600 text-lg">${item.totalPrice.toFixed(2)}</div>
+                  <div className="text-right ml-3">
+                    <div className="font-bold text-fire-600 text-sm">${item.totalPrice.toFixed(2)}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Order Summary</h3>
+          {/* Order Summary - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Order Summary</h3>
             
-            <div className="space-y-2 text-sm">
+            <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Subtotal:</span>
                 <span className="text-gray-900 font-bold">${order.subtotal.toFixed(2)}</span>
@@ -266,51 +279,41 @@ export const OrderStatusPage: React.FC = () => {
                 <span className="text-gray-600 font-medium">Tip:</span>
                 <span className="text-gray-900 font-bold">${order.tip.toFixed(2)}</span>
               </div>
-              <hr className="my-2 border-fire-200" />
-              <div className="flex justify-between text-lg font-bold">
+              <hr className="my-1.5 border-fire-200" />
+              <div className="flex justify-between text-base font-bold pt-1">
                 <span className="text-gray-900">Total:</span>
                 <span className="text-fire-600">${order.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          {/* Estimated Time */}
+          {/* Estimated Time - Compact */}
           {order.status === 'preparing' && (
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-400 rounded-2xl p-6 text-center shadow-lg">
-              <div className="text-5xl mb-2">⏰</div>
-              <h3 className="font-bold text-orange-900 mb-1 text-lg">Estimated Preparation Time</h3>
-              <p className="text-orange-700 font-medium">15-25 minutes</p>
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-400 rounded-xl p-3 text-center shadow-md">
+              <div className="text-4xl mb-1.5">⏰</div>
+              <h3 className="font-bold text-orange-900 mb-0.5 text-sm">Estimated Preparation Time</h3>
+              <p className="text-orange-700 font-medium text-xs">15-25 minutes</p>
             </div>
           )}
 
           {order.status === 'ready' && (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-2xl p-6 text-center shadow-lg">
-              <div className="text-5xl mb-2">🔔</div>
-              <h3 className="font-bold text-green-900 mb-1 text-lg">Your Order is Ready!</h3>
-              <p className="text-green-700 font-medium">Please proceed to pickup or wait for delivery</p>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-400 rounded-xl p-3 text-center shadow-md">
+              <div className="text-4xl mb-1.5">🔔</div>
+              <h3 className="font-bold text-green-900 mb-0.5 text-sm">Your Order is Ready!</h3>
+              <p className="text-green-700 font-medium text-xs">Please proceed to pickup or wait for delivery</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Fixed Action Buttons */}
-            {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <div className="space-y-2">
-          <button 
-            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
-            onClick={() => navigate(`/${customerId}/orders`)}
-          >
-            📋 View Order History
-          </button>
-          
-          <button 
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-            onClick={() => navigate(`/${customerId}`)}
-          >
-            🏠 Back to Home
-          </button>
-        </div>
+      {/* Fixed Bottom Actions - Compact */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-2.5 shadow-2xl z-50">
+        <button 
+          className="w-full bg-white text-fire-600 border border-fire-500 font-semibold text-xs py-2 px-4 rounded-lg hover:bg-fire-50 transition-all"
+          onClick={() => navigate(`/${customerId}/orders`)}
+        >
+          📋 View Order History
+        </button>
       </div>
     </div>
   )

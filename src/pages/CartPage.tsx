@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useCustomer } from '../context/CustomerContext'
 import { useCart } from '../context/CartContext'
 import { useActiveOrders } from '../hooks/useActiveOrders'
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate()
   const { customerId } = useParams<{ customerId: string }>()
-  const { customer, location } = useCustomer()
   const { cart, updateItem, removeItem, clearCart, updateTip } = useCart()
   const { hasActiveOrders } = useActiveOrders()
   
@@ -68,75 +66,70 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-      {/* Fixed Header */}
-      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-center flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">🛒 Your Cart</h1>
-            <p className="text-fire-100 text-sm mt-1">Review your order</p>
-          </div>
+      {/* Header - Consistent */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-bold drop-shadow-md text-center flex-1">
+            🛒 Your Cart {cart.items.length > 0 && `(${cart.items.length})`}
+          </h1>
           {cart.items.length > 0 && (
             <button 
-              className="text-white hover:text-red-200 font-medium flex items-center gap-1.5 transition-colors ml-2"
+              className="text-white hover:text-red-200 font-medium flex items-center gap-1 transition-colors text-xs"
               onClick={handleClearCart}
             >
-              <span className="text-xl">🗑️</span>
-              <span className="hidden sm:inline text-sm">Clear</span>
+              <span className="text-base">🗑️</span>
+              <span>Clear</span>
             </button>
           )}
         </div>
-
-        {/* Customer Summary */}
-        {customer && location && (
-          <div className="flex justify-center gap-4 text-sm text-fire-50 pt-3 border-t border-fire-400/30">
-            <span className="flex items-center gap-1.5">
-              <span className="text-base">👤</span>
-              <span className="font-medium">{customer.name}</span>
-            </span>
-            <span className="flex items-center gap-1 truncate">
-              📍 {location.address}
-            </span>
-          </div>
-        )}
       </div>
+
+      {/* Floating Home Button */}
+      <button
+        onClick={() => navigate(`/${customerId}`)}
+        className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+        title="Back to Home"
+      >
+        🏠
+      </button>
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
-        <div className="p-4 pb-40">{/* Extra bottom padding for fixed buttons */}
+        <div className="pb-40">
 
             {cart.items.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-7xl mb-4">🛒</div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
-                <p className="text-gray-600 mb-6">Add some delicious items from our menu!</p>
+              <div className="text-center py-12 px-4">
+                <div className="text-6xl mb-3">🛒</div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
+                <p className="text-gray-600 text-sm mb-4">Add some delicious items from our menu!</p>
                 <button 
-                  className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+                  className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all text-sm"
                   onClick={handleContinueShopping}
                 >
                   🔥 Browse Menu
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 px-3 pt-3">
                 {/* Cart Items */}
-                <div className="space-y-3">
-                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <div className="space-y-2">
+                  <h2 className="text-sm font-bold text-gray-700 flex items-center gap-1.5 px-1">
                     <span>🛒</span>
                     <span>Order Items ({cart.items.length})</span>
                   </h2>
                   
                   {cart.items.map((item) => (
-                    <div key={item.id} className="bg-white rounded-2xl shadow-lg p-4 border-2 border-transparent hover:border-fire-300 transition-all">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 mb-1 text-lg">{item.itemName}</h3>
-                          <p className="text-sm text-gray-600 mb-2">${item.itemPrice.toFixed(2)} each</p>
+                    <div key={item.id} className="bg-white rounded-xl shadow-md p-3 border border-gray-100">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-gray-900 text-sm leading-tight">{item.itemName}</h3>
+                          <p className="text-xs text-gray-600">${item.itemPrice.toFixed(2)} each</p>
                           
                           {/* Modifiers */}
                           {item.selectedModifiers && item.selectedModifiers.length > 0 && (
-                            <div className="space-y-1 mb-2 bg-fire-50 p-2 rounded-lg">
+                            <div className="space-y-0.5 mt-1.5 bg-fire-50 p-1.5 rounded-md">
                               {item.selectedModifiers.map((modifier, idx) => (
-                                <div key={idx} className="text-sm text-fire-800">
+                                <div key={idx} className="text-xs text-fire-800">
                                   <span className="font-medium">{modifier.modifierName}:</span>
                                   {modifier.selectedOptions.map((option, optIdx) => (
                                     <span key={optIdx} className="ml-1">
@@ -150,29 +143,29 @@ export const CartPage: React.FC = () => {
                           
                           {/* Special Notes */}
                           {item.specialNotes && (
-                            <div className="text-sm text-fire-800 bg-amber-50 p-2 rounded border-l-4 border-fire-400">
+                            <div className="text-xs text-fire-800 bg-amber-50 p-1.5 rounded border-l-2 border-fire-400 mt-1.5">
                               <span className="font-medium">Note:</span> {item.specialNotes}
                             </div>
                           )}
                         </div>
                         
-                        <div className="text-right ml-4">
-                          <div className="font-bold text-xl bg-gradient-to-r from-fire-600 to-ember-600 bg-clip-text text-transparent">${item.totalPrice.toFixed(2)}</div>
+                        <div className="text-right ml-3">
+                          <div className="font-bold text-base bg-gradient-to-r from-fire-600 to-ember-600 bg-clip-text text-transparent">${item.totalPrice.toFixed(2)}</div>
                         </div>
                       </div>
                       
-                      {/* Quantity Controls */}
+                      {/* Quantity Controls - Compact */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <button
-                            className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors shadow-md"
+                            className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors text-sm"
                             onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                           >
                             -
                           </button>
-                          <span className="font-bold text-gray-900 min-w-[2.5rem] text-center text-lg">{item.quantity}</span>
+                          <span className="font-bold text-gray-900 min-w-[2rem] text-center text-sm">{item.quantity}</span>
                           <button
-                            className="w-10 h-10 rounded-full bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 flex items-center justify-center font-bold text-white transition-all shadow-md"
+                            className="w-8 h-8 rounded-full bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 flex items-center justify-center font-bold text-white transition-all text-sm"
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                           >
                             +
@@ -180,10 +173,10 @@ export const CartPage: React.FC = () => {
                         </div>
                         
                         <button
-                          className="text-red-600 hover:text-red-700 font-bold text-sm transition-colors flex items-center gap-1"
+                          className="text-red-600 hover:text-red-700 font-semibold text-xs transition-colors flex items-center gap-0.5"
                           onClick={() => removeItem(item.id)}
                         >
-                          <span>🗑️</span>
+                          <span className="text-sm">🗑️</span>
                           <span>Remove</span>
                         </button>
                       </div>
@@ -191,21 +184,21 @@ export const CartPage: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Tip Selection */}
-                <div className="bg-white rounded-2xl shadow-lg p-4 border-2 border-transparent hover:border-fire-300 transition-all">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                {/* Tip Selection - Compact */}
+                <div className="bg-white rounded-xl shadow-md p-3 border border-gray-100">
+                  <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-1.5">
                     <span>💰</span>
                     <span>Add Tip</span>
                   </h3>
                   
-                  {/* Percentage Options in 2x2 Grid */}
-                  <div className="grid grid-cols-2 gap-2 mb-3">
+                  {/* Percentage Options in 3x2 Grid - Compact */}
+                  <div className="grid grid-cols-3 gap-1.5 mb-2">
                     {[15, 18, 20, 25].map(percentage => (
                       <button
                         key={percentage}
-                        className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
+                        className={`py-2 px-3 rounded-lg font-semibold text-sm transition-all ${
                           tipPercentage === percentage && !showCustomTip
-                            ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white scale-105'
+                            ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-fire-50 hover:text-fire-600'
                         }`}
                         onClick={() => handleTipChange(percentage)}
@@ -213,58 +206,55 @@ export const CartPage: React.FC = () => {
                         {percentage}%
                       </button>
                     ))}
-                  </div>
-                  
-                  {/* No Tip and Custom Options */}
-                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
+                      className={`py-2 px-3 rounded-lg font-semibold text-sm transition-all ${
                         tipPercentage === 0 && !showCustomTip
-                          ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white scale-105'
+                          ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                       onClick={() => handleTipChange(0)}
                     >
                       No Tip
                     </button>
-                    
-                    <button
-                      className={`py-3 px-4 rounded-xl font-bold transition-all shadow-md ${
-                        showCustomTip
-                          ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white scale-105'
-                          : 'bg-gray-100 text-gray-700 hover:bg-fire-50 hover:text-fire-600'
-                      }`}
-                      onClick={() => setShowCustomTip(!showCustomTip)}
-                    >
-                      Custom
-                    </button>
                   </div>
                   
-                  {/* Custom Tip Input */}
+                  {/* Custom Tip Button */}
+                  <button
+                    className={`w-full py-2 px-3 rounded-lg font-semibold text-sm transition-all ${
+                      showCustomTip
+                        ? 'bg-gradient-to-r from-fire-500 to-ember-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-fire-50 hover:text-fire-600'
+                    }`}
+                    onClick={() => setShowCustomTip(!showCustomTip)}
+                  >
+                    Custom
+                  </button>
+                  
+                  {/* Custom Tip Input - Compact */}
                   {showCustomTip && (
-                    <div className="flex items-center justify-center gap-2 mt-3 p-3 bg-fire-50 rounded-xl border-2 border-fire-200">
-                      <span className="text-gray-700 font-bold text-lg">$</span>
+                    <div className="flex items-center justify-center gap-2 mt-2 p-2 bg-fire-50 rounded-lg border border-fire-200">
+                      <span className="text-gray-700 font-bold text-sm">$</span>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
                         value={customTip}
                         onChange={(e) => handleCustomTipChange(e.target.value)}
-                        className="w-28 px-3 py-2 border-2 border-fire-300 rounded-lg text-center font-bold focus:outline-none focus:ring-2 focus:ring-fire-500"
+                        className="w-24 px-2 py-1.5 border border-fire-300 rounded-md text-center font-bold text-sm focus:outline-none focus:ring-2 focus:ring-fire-500"
                         placeholder="0.00"
                       />
                     </div>
                   )}
                 </div>
 
-                {/* Order Summary */}
-                <div className="bg-gradient-to-br from-fire-50 to-amber-50 rounded-2xl shadow-lg p-4 border-2 border-fire-200">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                {/* Order Summary - Compact */}
+                <div className="bg-gradient-to-br from-fire-50 to-amber-50 rounded-xl shadow-md p-3 border border-fire-200">
+                  <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-1.5 text-sm">
                     <span>📊</span>
                     <span>Order Summary</span>
                   </h3>
                   
-                  <div className="space-y-3 text-base">
+                  <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-700 font-medium">Subtotal:</span>
                       <span className="text-gray-900 font-bold">${cart.subtotal.toFixed(2)}</span>
@@ -277,8 +267,8 @@ export const CartPage: React.FC = () => {
                       <span className="text-gray-700 font-medium">Tip:</span>
                       <span className="text-gray-900 font-bold">${cart.tip.toFixed(2)}</span>
                     </div>
-                    <hr className="my-2 border-fire-300" />
-                    <div className="flex justify-between text-2xl font-bold pt-2">
+                    <hr className="my-1.5 border-fire-300" />
+                    <div className="flex justify-between text-lg font-bold pt-1">
                       <span className="text-gray-900">Total:</span>
                       <span className="bg-gradient-to-r from-fire-600 to-ember-600 bg-clip-text text-transparent">${cart.total.toFixed(2)}</span>
                     </div>
@@ -289,12 +279,12 @@ export const CartPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Fixed Action Buttons - Always visible at bottom */}
+      {/* Fixed Action Buttons - Compact */}
       {cart.items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-          <div className="space-y-2">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-2.5 shadow-2xl z-50">
+          <div className="space-y-1.5">
             <button 
-              className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
+              className="w-full bg-white text-fire-600 border border-fire-500 font-semibold text-xs py-2 px-4 rounded-lg hover:bg-fire-50 transition-all"
               onClick={handleContinueShopping}
             >
               🍽️ Add More Items
@@ -302,7 +292,7 @@ export const CartPage: React.FC = () => {
             
             {hasActiveOrders ? (
               <button 
-                className="w-full bg-gray-300 text-gray-500 font-bold text-lg py-4 px-6 rounded-xl cursor-not-allowed shadow-md"
+                className="w-full bg-gray-300 text-gray-500 font-semibold text-sm py-2.5 px-4 rounded-lg cursor-not-allowed shadow-md"
                 disabled
                 title="You have active orders. Please wait for them to complete."
               >
@@ -310,19 +300,12 @@ export const CartPage: React.FC = () => {
               </button>
             ) : (
               <button 
-                className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold text-sm py-2.5 px-4 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
                 onClick={handleProceedToCheckout}
               >
-                Proceed to Checkout →
+                ✅ Proceed to Checkout
               </button>
             )}
-            
-            <button 
-              className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
-              onClick={() => navigate(`/${customerId}`)}
-            >
-              🏠 Back to Home
-            </button>
           </div>
         </div>
       )}

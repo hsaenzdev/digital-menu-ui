@@ -130,38 +130,38 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
   const hasModifiers = item.modifierGroups && item.modifierGroups.length > 0
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-        {/* Header with fire gradient */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-fire-500 to-ember-500 text-white flex-shrink-0">
-          <h2 className="text-xl font-bold drop-shadow-md">{item.name}</h2>
-          <button className="text-white hover:text-fire-100 text-3xl leading-none font-bold" onClick={onClose}>×</button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 z-50" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+        {/* Header - Compact */}
+        <div className="flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-fire-600 to-ember-600 text-white flex-shrink-0">
+          <h2 className="text-lg font-bold drop-shadow-md">{item.name}</h2>
+          <button className="text-white hover:text-fire-100 text-2xl leading-none font-bold" onClick={onClose}>×</button>
         </div>
 
-        <div className="p-4 overflow-y-auto flex-1 bg-gradient-to-b from-orange-50 to-white">
+        <div className="p-3 overflow-y-auto flex-1 bg-gradient-to-b from-orange-50 to-white">
           {item.description && (
-            <p className="text-gray-600 mb-4 leading-relaxed">{item.description}</p>
+            <p className="text-gray-600 mb-2.5 text-sm leading-relaxed">{item.description}</p>
           )}
           
-          <div className="bg-gradient-to-r from-fire-50 to-ember-50 border-2 border-fire-300 p-3 rounded-xl mb-4">
-            <span className="font-bold text-gray-900">Base Price: <span className="text-fire-600">${item.price.toFixed(2)}</span></span>
+          <div className="bg-gradient-to-r from-fire-50 to-ember-50 border border-fire-300 p-2 rounded-lg mb-2.5">
+            <span className="font-bold text-gray-900 text-sm">Base Price: <span className="text-fire-600">${item.price.toFixed(2)}</span></span>
           </div>
 
-          {/* Quantity Selector - Prominent Position */}
-          <div className="bg-white border-2 border-fire-400 rounded-xl p-4 mb-4 shadow-md">
-            <label className="block text-center text-sm font-bold text-gray-900 mb-3">Quantity</label>
-            <div className="flex items-center justify-center space-x-6">
+          {/* Quantity Selector - Compact */}
+          <div className="bg-white border border-fire-400 rounded-lg p-2.5 mb-2.5 shadow-sm">
+            <label className="block text-center text-xs font-bold text-gray-900 mb-2">Quantity</label>
+            <div className="flex items-center justify-center space-x-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
-                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-xl font-bold text-white shadow-md transition-all"
               >
                 -
               </button>
-              <span className="text-3xl font-bold min-w-[4rem] text-center text-gray-900">{quantity}</span>
+              <span className="text-2xl font-bold min-w-[3rem] text-center text-gray-900">{quantity}</span>
               <button 
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-12 h-12 rounded-full bg-gradient-to-r from-fire-400 to-ember-400 hover:from-fire-500 hover:to-ember-500 flex items-center justify-center text-2xl font-bold text-white shadow-md transform active:scale-95 transition-all"
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 flex items-center justify-center text-xl font-bold text-white shadow-md transition-all"
               >
                 +
               </button>
@@ -169,9 +169,9 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
           </div>
 
           {errors.length > 0 && (
-            <div className="bg-red-50 border-2 border-red-300 rounded-xl p-3 mb-4 shadow-md">
+            <div className="bg-red-50 border border-red-300 rounded-lg p-2 mb-2.5 shadow-sm">
               {errors.map((error, index) => (
-                <div key={index} className="text-red-700 text-sm flex items-center gap-2">
+                <div key={index} className="text-red-700 text-xs flex items-center gap-1.5">
                   <span>⚠️</span> {error}
                 </div>
               ))}
@@ -179,19 +179,19 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
           )}
 
           {hasModifiers ? (
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {item.modifierGroups!.map(group => (
-                <div key={group.id} className="bg-white border-2 border-fire-200 rounded-xl p-4 shadow-md">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-lg">{group.name}</h3>
+                <div key={group.id} className="bg-white border border-fire-200 rounded-lg p-2.5 shadow-sm">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <h3 className="font-bold text-gray-900 text-sm">{group.name}</h3>
                     {group.isRequired && (
-                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">Required</span>
+                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-sm">Required</span>
                     )}
                   </div>
                   {group.description && (
-                    <p className="text-gray-600 text-sm mb-3">{group.description}</p>
+                    <p className="text-gray-600 text-xs mb-2">{group.description}</p>
                   )}
-                  <div className="text-sm text-gray-500 mb-3 font-medium">
+                  <div className="text-xs text-gray-500 mb-2 font-medium">
                     {group.maxSelection === 1 ? (
                       <span>Select 1 option</span>
                     ) : (
@@ -202,7 +202,7 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {group.modifiers.map(modifier => {
                       const isSelected = selectedModifiers[group.id]?.includes(modifier.id)
                       const selectionType = group.maxSelection === 1 ? 'radio' : 'checkbox'
@@ -210,23 +210,23 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
                       return (
                         <label
                           key={modifier.id}
-                          className={`flex items-center justify-between p-3 border-2 rounded-xl cursor-pointer transition-all shadow-sm ${
+                          className={`flex items-center justify-between p-2 border rounded-lg cursor-pointer transition-all shadow-sm ${
                             isSelected 
-                              ? 'border-fire-500 bg-gradient-to-r from-fire-50 to-ember-50 shadow-md' 
+                              ? 'border-fire-500 bg-gradient-to-r from-fire-50 to-ember-50' 
                               : 'border-gray-200 hover:border-fire-300 hover:bg-orange-50'
                           }`}
                         >
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-2">
                             <input
                               type={selectionType}
                               checked={isSelected}
                               onChange={() => handleModifierToggle(group.id, modifier.id, group)}
-                              className="w-5 h-5 text-fire-600 focus:ring-fire-500 focus:ring-2"
+                              className="w-4 h-4 text-fire-600 focus:ring-fire-500 focus:ring-1"
                             />
-                            <span className="font-semibold text-gray-900">{modifier.name}</span>
+                            <span className="font-semibold text-gray-900 text-sm">{modifier.name}</span>
                           </div>
                           {modifier.priceAdjustment !== 0 && (
-                            <span className="text-sm font-bold text-fire-600">
+                            <span className="text-xs font-bold text-fire-600">
                               {modifier.priceAdjustment > 0 ? '+' : ''}
                               ${modifier.priceAdjustment.toFixed(2)}
                             </span>
@@ -239,11 +239,11 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-4 font-medium">No customization options available for this item.</p>
+            <p className="text-gray-500 text-center py-3 font-medium text-sm">No customization options available.</p>
           )}
 
-          <div className="border-t-2 border-fire-200 pt-4 mt-4">
-            <label htmlFor="special-notes" className="block text-sm font-bold text-gray-900 mb-2">
+          <div className="border-t border-fire-200 pt-2.5 mt-2.5">
+            <label htmlFor="special-notes" className="block text-xs font-bold text-gray-900 mb-1.5">
               Special Instructions:
             </label>
             <textarea
@@ -251,21 +251,21 @@ export const ModifierSelectionModal: React.FC<ModifierSelectionModalProps> = ({
               placeholder="Any special requests? (e.g., no onions, extra sauce)"
               value={specialNotes}
               onChange={(e) => setSpecialNotes(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-fire-500 shadow-sm"
+              rows={2}
+              className="w-full px-2.5 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-fire-500 shadow-sm text-sm"
             />
           </div>
         </div>
 
-        <div className="flex space-x-3 p-4 border-t-2 border-fire-400 bg-gradient-to-r from-orange-50 to-red-50 flex-shrink-0">
+        <div className="flex space-x-2 p-2.5 border-t border-fire-400 bg-gradient-to-r from-orange-50 to-red-50 flex-shrink-0">
           <button 
-            className="flex-1 px-4 py-3 border-2 border-fire-500 rounded-xl text-fire-600 font-bold hover:bg-fire-50 transition-all shadow-md transform active:scale-95" 
+            className="flex-1 px-3 py-2 border border-fire-500 rounded-lg text-fire-600 font-semibold hover:bg-fire-50 transition-all shadow-sm text-sm" 
             onClick={onClose}
           >
             Cancel
           </button>
           <button 
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-fire-500 to-ember-500 text-white rounded-xl font-bold hover:from-fire-600 hover:to-ember-600 transition-all shadow-lg transform active:scale-95"
+            className="flex-1 px-3 py-2 bg-gradient-to-r from-fire-600 to-ember-600 text-white rounded-lg font-semibold hover:from-fire-700 hover:to-ember-700 transition-all shadow-lg text-sm"
             onClick={handleAddToCart}
           >
             Add {quantity} - ${calculateTotalPrice().toFixed(2)}

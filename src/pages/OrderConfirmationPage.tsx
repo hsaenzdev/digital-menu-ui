@@ -73,61 +73,60 @@ export const OrderConfirmationPage: React.FC = () => {
   if (submittedOrder) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">✅ Order Submitted!</h1>
-          <p className="text-green-100 text-sm mt-1 text-center">Thank you for your order</p>
+        {/* Header - Consistent */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 py-2.5 shadow-lg">
+          <h1 className="text-lg font-bold text-center drop-shadow-md">✅ Order Submitted</h1>
         </div>
+
+        {/* Floating Home Button */}
+        <button
+          onClick={() => navigate(`/${customerId}`)}
+          className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-green-400"
+          title="Back to Home"
+        >
+          🏠
+        </button>
         
         {/* Success Content */}
         <div className="flex-1 overflow-y-auto bg-gradient-to-b from-green-50 to-white">
-          <div className="p-4 pb-48">
-            <div className="text-center py-12">
-              <div className="text-7xl mb-4">🎉</div>
-              <h2 className="text-3xl font-bold text-green-600 mb-2">Order Confirmed!</h2>
-              <p className="text-2xl text-green-600 font-bold">Order #{submittedOrder?.id}</p>
+          <div className="p-3 pb-32">
+            <div className="text-center py-8">
+              <div className="text-5xl mb-3">🎉</div>
+              <h2 className="text-xl font-bold text-green-600 mb-1.5">Order Confirmed!</h2>
+              <p className="text-lg text-green-600 font-bold">Order #{submittedOrder?.id}</p>
               
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 mt-6 text-left shadow-lg">
-                <h3 className="font-bold text-green-900 mb-3 text-lg">Order Summary</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 rounded-xl p-3 mt-4 text-left shadow-md">
+                <h3 className="font-bold text-green-900 mb-2 text-sm">Order Summary</h3>
+                <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
                     <span className="text-green-700 font-medium">Customer:</span>
                     <span className="font-bold text-green-900">{customer?.name}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-green-700 font-medium">Total:</span>
-                    <span className="font-bold text-green-600 text-xl">${submittedOrder?.total?.toFixed(2)}</span>
+                    <span className="font-bold text-green-600 text-base">${submittedOrder?.total?.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
               
-              <p className="text-gray-700 font-medium mt-6 mb-4 text-lg">
+              <p className="text-gray-700 font-medium mt-4 mb-2 text-sm">
                 🎊 Your order is on its way!
               </p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs">
                 We'll prepare your delicious food and deliver it hot to your door.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Fixed Action Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-green-400 p-4 shadow-2xl z-50">
-          <div className="space-y-2">
-            <button 
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-green-600 hover:to-emerald-600 transform active:scale-95 transition-all"
-              onClick={() => navigate(`/${customerId}/order-status/${submittedOrder.id}`)}
-            >
-              📋 View Order Details
-            </button>
-            
-            <button 
-              className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate(`/${customerId}`)}
-            >
-              🏠 Back to Home
-            </button>
-          </div>
+        {/* Fixed Action Button - Compact */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-green-400 p-2.5 shadow-2xl z-50">
+          <button 
+            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold text-sm py-2.5 px-4 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
+            onClick={() => navigate(`/${customerId}/order-status/${submittedOrder.id}`)}
+          >
+            📋 View Order Details
+          </button>
         </div>
       </div>
     )
@@ -136,20 +135,28 @@ export const OrderConfirmationPage: React.FC = () => {
   if (!hasCartItems) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Confirmation</h1>
-          <p className="text-fire-100 text-sm mt-1 text-center">No items found</p>
+        {/* Header - Consistent */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+          <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Confirmation</h1>
         </div>
+
+        {/* Floating Home Button */}
+        <button
+          onClick={() => navigate(`/${customerId}`)}
+          className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+          title="Back to Home"
+        >
+          🏠
+        </button>
         
         {/* Error Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-          <div className="text-center py-12 px-4">
-            <div className="text-7xl mb-4">🛒</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Items in Cart</h3>
-            <p className="text-gray-600 mb-6 text-lg">Your cart is empty. Please add some items before proceeding.</p>
+          <div className="text-center py-8 px-3">
+            <div className="text-5xl mb-3">🛒</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No Items in Cart</h3>
+            <p className="text-gray-600 mb-4 text-sm">Your cart is empty. Please add some items before proceeding.</p>
             <button 
-              className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+              className="bg-gradient-to-r from-fire-600 to-ember-600 text-white font-semibold text-sm py-2.5 px-6 rounded-lg hover:from-fire-700 hover:to-ember-700 transition-all shadow-lg"
               onClick={() => navigate(`/${customerId}/menu`)}
             >
               Browse Menu
@@ -163,20 +170,28 @@ export const OrderConfirmationPage: React.FC = () => {
   if (!hasCustomerInfo) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        {/* Fixed Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Confirmation</h1>
-          <p className="text-fire-100 text-sm mt-1 text-center">Customer info required</p>
+        {/* Header - Consistent */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+          <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Confirmation</h1>
         </div>
+
+        {/* Floating Home Button */}
+        <button
+          onClick={() => navigate(`/${customerId}`)}
+          className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+          title="Back to Home"
+        >
+          🏠
+        </button>
         
         {/* Error Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-          <div className="text-center py-12 px-4">
-            <div className="text-7xl mb-4">👤</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Customer Information Required</h3>
-            <p className="text-gray-600 mb-6 text-lg">Please provide your information to proceed with the order.</p>
+          <div className="text-center py-8 px-3">
+            <div className="text-5xl mb-3">👤</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Customer Information Required</h3>
+            <p className="text-gray-600 mb-4 text-sm">Please provide your information to proceed with the order.</p>
             <button 
-              className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+              className="bg-gradient-to-r from-fire-600 to-ember-600 text-white font-semibold text-sm py-2.5 px-6 rounded-lg hover:from-fire-700 hover:to-ember-700 transition-all shadow-lg"
               onClick={() => navigate(`/${customerId}/setup`)}
             >
               Enter Customer Info
@@ -189,49 +204,55 @@ export const OrderConfirmationPage: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-      {/* Fixed Header */}
-      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">📋 Order Confirmation</h1>
-          <p className="text-fire-100 text-sm mt-1">Review and submit your order</p>
-        </div>
+      {/* Header - Consistent */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
+        <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Confirmation</h1>
       </div>
+
+      {/* Floating Home Button */}
+      <button
+        onClick={() => navigate(`/${customerId}`)}
+        className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
+        title="Back to Home"
+      >
+        🏠
+      </button>
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
-        <div className="p-4 pb-40 space-y-6">
+        <div className="p-3 pb-32 space-y-3">
 
-          {/* Customer Information */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Customer Information</h3>
+          {/* Customer Information - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Customer Information</h3>
             
-            <div className="space-y-3 text-sm">
+            <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Name:</span>
                 <span className="font-bold text-gray-900">{customer.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Location:</span>
-                <span className="font-bold text-gray-900">{location?.address || 'Location not available'}</span>
+                <span className="font-bold text-gray-900 truncate ml-2">{location?.address || 'Location not available'}</span>
               </div>
             </div>
           </div>
 
-          {/* Order Items */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Order Items ({cart.items.length})</h3>
+          {/* Order Items - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Order Items ({cart.items.length})</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               {cart.items.map((item, index) => (
-                <div key={index} className="flex justify-between items-start p-4 bg-gradient-to-r from-fire-50 to-ember-50 rounded-xl border border-fire-200">
+                <div key={index} className="flex justify-between items-start p-2.5 bg-gradient-to-r from-fire-50 to-ember-50 rounded-lg border border-fire-200">
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900">{item.itemName}</h4>
-                    <p className="text-sm text-gray-600 font-medium">Quantity: {item.quantity}</p>
-                    <p className="text-sm text-gray-600 font-medium">${item.itemPrice.toFixed(2)} each</p>
+                    <h4 className="font-bold text-gray-900 text-sm">{item.itemName}</h4>
+                    <p className="text-xs text-gray-600 font-medium">Quantity: {item.quantity}</p>
+                    <p className="text-xs text-gray-600 font-medium">${item.itemPrice.toFixed(2)} each</p>
                     
                     {/* Modifiers */}
                     {item.selectedModifiers && item.selectedModifiers.length > 0 && (
-                      <div className="mt-2 space-y-1">
+                      <div className="mt-1.5 space-y-0.5">
                         {item.selectedModifiers.map((modifier, idx) => (
                           <div key={idx} className="text-xs text-gray-600">
                             <span className="font-bold">{modifier.modifierName}:</span>
@@ -247,25 +268,25 @@ export const OrderConfirmationPage: React.FC = () => {
                     
                     {/* Special Notes */}
                     {item.specialNotes && (
-                      <div className="mt-2 text-sm text-fire-800 bg-amber-50 p-2 rounded border-l-4 border-fire-400">
+                      <div className="mt-1.5 text-xs text-fire-800 bg-amber-50 p-1.5 rounded border-l-2 border-fire-400">
                         <span className="font-bold">Note:</span> {item.specialNotes}
                       </div>
                     )}
                   </div>
                   
-                  <div className="text-right ml-4">
-                    <div className="font-bold text-fire-600 text-lg">${item.totalPrice.toFixed(2)}</div>
+                  <div className="text-right ml-3">
+                    <div className="font-bold text-fire-600 text-sm">${item.totalPrice.toFixed(2)}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200">
-            <h3 className="font-bold text-gray-900 mb-4 text-lg">Order Summary</h3>
+          {/* Order Summary - Compact */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2 text-sm">Order Summary</h3>
             
-            <div className="space-y-2 text-sm">
+            <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Subtotal:</span>
                 <span className="text-gray-900 font-bold">${cart.subtotal.toFixed(2)}</span>
@@ -278,8 +299,8 @@ export const OrderConfirmationPage: React.FC = () => {
                 <span className="text-gray-600 font-medium">Tip:</span>
                 <span className="text-gray-900 font-bold">${cart.tip.toFixed(2)}</span>
               </div>
-              <hr className="my-2 border-fire-200" />
-              <div className="flex justify-between text-lg font-bold">
+              <hr className="my-1.5 border-fire-200" />
+              <div className="flex justify-between text-base font-bold pt-1">
                 <span className="text-gray-900">Total:</span>
                 <span className="text-fire-600">${calculateTotal().toFixed(2)}</span>
               </div>
@@ -288,43 +309,36 @@ export const OrderConfirmationPage: React.FC = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-6 shadow-md">
+            <div className="bg-red-50 border border-red-300 rounded-xl p-3 shadow-md">
               <div className="text-red-800">
-                <div className="font-bold mb-1">Order Submission Failed</div>
-                <div className="text-sm">{error}</div>
+                <div className="font-bold mb-0.5 text-sm">Order Submission Failed</div>
+                <div className="text-xs">{error}</div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Fixed Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <div className="space-y-2">
+      {/* Fixed Action Buttons - Compact */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-2.5 shadow-2xl z-50">
+        <div className="space-y-1.5">
           <button 
-            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
+            className="w-full bg-white text-fire-600 border border-fire-500 font-semibold text-xs py-2 px-4 rounded-lg hover:bg-fire-50 transition-all"
             onClick={() => navigate(`/${customerId}/cart`)}
           >
             🛒 Go to Cart
           </button>
           
           <button 
-            className={`w-full font-bold text-lg py-4 px-6 rounded-xl shadow-lg transition-all ${
+            className={`w-full font-semibold text-sm py-2.5 px-4 rounded-lg transition-all shadow-lg ${
               isSubmitting 
                 ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transform active:scale-95'
+                : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
             }`}
             onClick={handleSubmitOrder}
             disabled={isSubmitting}
           >
-              {isSubmitting ? '⏳ Submitting Order...' : '✅ Submit Order'}
-          </button>
-          
-          <button 
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-            onClick={() => navigate(`/${customerId}`)}
-          >
-            🏠 Back to Home
+              {isSubmitting ? '⏳ Submitting...' : '✅ Submit Order'}
           </button>
         </div>
       </div>
