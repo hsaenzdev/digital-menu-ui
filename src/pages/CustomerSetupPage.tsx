@@ -6,13 +6,14 @@ import type { LocationData } from '../types'
 export const CustomerSetupPage: React.FC = () => {
   const navigate = useNavigate()
   const { customerId } = useParams<{ customerId: string }>()
-  const { customer, setCustomer, setLocation } = useCustomer()
+  const { customer, setCustomer, setLocation, setCustomerLocationId } = useCustomer()
   
   // Location state
   const [locationData, setLocationData] = useState<LocationData | null>(null)
   const [address, setAddress] = useState('')
   const [locationLoading, setLocationLoading] = useState(false)
   const [locationError, setLocationError] = useState('')
+  const [resolvedLocationId, setResolvedLocationId] = useState<string | null>(null) // Track resolved location ID
   
   // Customer info state
   const [name, setName] = useState('')
@@ -55,23 +56,35 @@ export const CustomerSetupPage: React.FC = () => {
         const { latitude, longitude } = position.coords
         
         try {
+          // Call the smart location resolver endpoint
           const response = await fetch(
-            `http://localhost:3000/api/geocoding/reverse?lat=${latitude}&lon=${longitude}`
+            `http://localhost:3000/api/customers/${customerId}/locations/resolve`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ latitude, longitude })
+            }
           )
           
           if (response.ok) {
             const data = await response.json()
             
-            if (data.success && data.address) {
-              setAddress(data.address)
+            if (data.success && data.location) {
+              // Location resolved (either found existing or created new)
+              setAddress(data.location.address)
               setLocationData({
                 latitude,
                 longitude,
-                address: data.address
+                address: data.location.address
               })
-              setLocationError('')
+              setResolvedLocationId(data.location.id) // Store the location ID
+              
+              // Show helpful message to user
+              if (data.location.isExisting) {
+                setLocationError('') // Clear any errors
+              }
             } else {
-              setLocationError(data.message || 'Could not get address. Please enter manually.')
+              setLocationError(data.error || 'Could not resolve location. Please enter manually.')
               setLocationData({
                 latitude,
                 longitude,
@@ -79,7 +92,7 @@ export const CustomerSetupPage: React.FC = () => {
               })
             }
           } else {
-            setLocationError('Could not get address. Please enter manually.')
+            setLocationError('Could not resolve location. Please enter manually.')
             setLocationData({
               latitude,
               longitude,
@@ -88,8 +101,9 @@ export const CustomerSetupPage: React.FC = () => {
           }
           
           setLocationLoading(false)
-        } catch {
-          setLocationError('Could not get address. Please enter manually.')
+        } catch (err) {
+          console.error('Location resolve error:', err)
+          setLocationError('Could not resolve location. Please enter manually.')
           setLocationData({
             latitude,
             longitude,
@@ -154,6 +168,11 @@ export const CustomerSetupPage: React.FC = () => {
       return
     }
 
+    if (!customerId) {
+      setError('No customer ID in URL. Please start from the link provided.')
+      return
+    }
+
     setSaving(true)
     setError('')
 
@@ -166,7 +185,8 @@ export const CustomerSetupPage: React.FC = () => {
             address: address.trim()
           }
 
-      const response = await fetch(`/api/customers/${customer.id}`, {
+      // Update customer name
+      const nameResponse = await fetch(`/api/customers/${customer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -174,15 +194,40 @@ export const CustomerSetupPage: React.FC = () => {
         })
       })
 
-      if (!response.ok) {
+      if (!nameResponse.ok) {
         throw new Error('Failed to update customer')
       }
 
+      // Update customer_location address if we have a resolved location and address changed
+      if (resolvedLocationId && address.trim()) {
+        const locationUpdateResponse = await fetch(
+          `http://localhost:3000/api/customers/${customer.id}/locations/${resolvedLocationId}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              address: address.trim()
+            })
+          }
+        )
+
+        if (!locationUpdateResponse.ok) {
+          console.error('Failed to update location address')
+          // Don't fail the whole form, just log the error
+        }
+      }
+
+      // Save customer and location to context
       setCustomer({
         ...customer,
         name: name.trim()
       })
       setLocation(finalLocation)
+      
+      // Save customerLocationId to context if we have one
+      if (resolvedLocationId) {
+        setCustomerLocationId(resolvedLocationId)
+      }
 
       navigate(`/${customerId}/menu`)
     } catch {

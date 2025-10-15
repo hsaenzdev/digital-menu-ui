@@ -89,13 +89,23 @@ export interface Cart {
   total: number
 }
 
+// Customer Location type
+export interface CustomerLocation {
+  id: string
+  address: string
+  label: string | null
+  isPrimary: boolean
+  lastUsedAt: Date
+}
+
 // Order types (customer-facing)
 export interface Order {
   id: string
   orderNumber: number
   customerId: string
   customer?: Customer // Customer data (optional for backwards compatibility)
-  address: string
+  customerLocationId: string
+  customerLocation?: CustomerLocation // Location data
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
   subtotal: number
   tax: number

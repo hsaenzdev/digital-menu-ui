@@ -2,7 +2,7 @@
  * Shared types for order management
  */
 
-import type { SelectedModifier, Customer } from './index'
+import type { SelectedModifier, Customer, CustomerLocation } from './index'
 
 export interface OrderItem {
   id: string
@@ -19,7 +19,8 @@ export interface Order {
   orderNumber: number
   customerId: string
   customer: Customer // Customer data via relationship
-  address?: string
+  customerLocationId: string
+  customerLocation?: CustomerLocation
   total: number
   subtotal: number
   tax: number

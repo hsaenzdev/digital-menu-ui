@@ -8,7 +8,7 @@ export const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate()
   const { customerId } = useParams<{ customerId: string }>()
   const { cart, clearCart } = useCart()
-  const { customer, location } = useCustomer()
+  const { customer, location, customerLocationId } = useCustomer()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,14 +27,18 @@ export const OrderConfirmationPage: React.FC = () => {
       return
     }
 
+    if (!customerLocationId) {
+      setError('Location not resolved. Please refresh and try again.')
+      return
+    }
+
     setIsSubmitting(true)
     setError(null)
 
     try {
       const orderData = {
-        customerId, // Link order to customer (platform info accessed via customer relation)
-        location: `${location.latitude},${location.longitude}`, // GPS coordinates
-        address: location.address || 'Unknown Address',
+        customerId, // Link order to customer
+        customerLocationId, // Required: Reference to customer_locations table
         items: cart.items,
         subtotal: cart.subtotal,
         tax: cart.tax,

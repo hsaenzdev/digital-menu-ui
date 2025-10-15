@@ -86,8 +86,8 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 {order.customer?.messengerPsid && (
                   <p className="text-sm text-gray-600 mt-1">💬 Messenger User</p>
                 )}
-                {order.address && (
-                  <p className="text-sm text-gray-600 mt-1">📍 {order.address}</p>
+                {order.customerLocation?.address && (
+                  <p className="text-sm text-gray-600 mt-1">📍 {order.customerLocation.address}</p>
                 )}
               </div>
             </div>

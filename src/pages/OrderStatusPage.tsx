@@ -203,7 +203,7 @@ export const OrderStatusPage: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Address:</span>
-                <span className="font-bold text-gray-900">{order.address}</span>
+                <span className="font-bold text-gray-900">{order.customerLocation?.address || 'Address not available'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 font-medium">Order Time:</span>
