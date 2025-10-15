@@ -316,6 +316,13 @@ export const CartPage: React.FC = () => {
                 Proceed to Checkout →
               </button>
             )}
+            
+            <button 
+              className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
+              onClick={() => navigate(`/${customerId}`)}
+            >
+              🏠 Back to Home
+            </button>
           </div>
         </div>
       )}

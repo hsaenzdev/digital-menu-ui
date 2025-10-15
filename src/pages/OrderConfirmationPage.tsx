@@ -101,28 +101,31 @@ export const OrderConfirmationPage: React.FC = () => {
                 </div>
               </div>
               
-              <p className="text-gray-600 font-medium mt-6 mb-6 text-lg">
-                Your order has been successfully submitted! You can track its progress or browse more items.
+              <p className="text-gray-700 font-medium mt-6 mb-4 text-lg">
+                🎊 Your order is on its way!
+              </p>
+              <p className="text-gray-600 text-sm">
+                We'll prepare your delicious food and deliver it hot to your door.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Fixed Action Buttons */}
+        {/* Fixed Action Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-green-400 p-4 shadow-2xl z-50">
           <div className="space-y-2">
             <button 
-              className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate(`/${customerId}/order-status/${submittedOrder?.id}`)}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-green-600 hover:to-emerald-600 transform active:scale-95 transition-all"
+              onClick={() => navigate(`/${customerId}/order-status/${submittedOrder.id}`)}
             >
-              📋 View Order Status
+              📋 View Order Details
             </button>
             
             <button 
-              className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-              onClick={() => navigate(`/${customerId}/orders`)}
+              className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+              onClick={() => navigate(`/${customerId}`)}
             >
-              📚 View Order History
+              🏠 Back to Home
             </button>
           </div>
         </div>
@@ -297,17 +300,33 @@ export const OrderConfirmationPage: React.FC = () => {
 
       {/* Fixed Action Buttons */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <button 
-          className={`w-full font-bold text-lg py-4 px-6 rounded-xl shadow-lg transition-all ${
-            isSubmitting 
-              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-              : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transform active:scale-95'
-          }`}
-          onClick={handleSubmitOrder}
-          disabled={isSubmitting}
-        >
-            {isSubmitting ? '⏳ Submitting Order...' : '✅ Submit Order'}
-        </button>
+        <div className="space-y-2">
+          <button 
+            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
+            onClick={() => navigate(`/${customerId}/cart`)}
+          >
+            🛒 Go to Cart
+          </button>
+          
+          <button 
+            className={`w-full font-bold text-lg py-4 px-6 rounded-xl shadow-lg transition-all ${
+              isSubmitting 
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transform active:scale-95'
+            }`}
+            onClick={handleSubmitOrder}
+            disabled={isSubmitting}
+          >
+              {isSubmitting ? '⏳ Submitting Order...' : '✅ Submit Order'}
+          </button>
+          
+          <button 
+            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+            onClick={() => navigate(`/${customerId}`)}
+          >
+            🏠 Back to Home
+          </button>
+        </div>
       </div>
     </div>
   )

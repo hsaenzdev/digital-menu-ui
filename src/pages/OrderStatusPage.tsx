@@ -294,20 +294,21 @@ export const OrderStatusPage: React.FC = () => {
       </div>
 
       {/* Fixed Action Buttons */}
+            {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
         <div className="space-y-2">
           <button 
-            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
+            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
             onClick={() => navigate(`/${customerId}/orders`)}
           >
-            View Order History
+            📋 View Order History
           </button>
           
           <button 
             className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-            onClick={() => navigate(`/${customerId}/menu`)}
+            onClick={() => navigate(`/${customerId}`)}
           >
-            Order Again
+            🏠 Back to Home
           </button>
         </div>
       </div>

@@ -113,9 +113,9 @@ export const OrderHistoryPage: React.FC = () => {
             <p className="text-gray-600 mb-6 text-lg font-medium">{error}</p>
             <button 
               className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-              onClick={() => navigate(`/${customerId}/menu`)}
+              onClick={() => navigate(`/${customerId}`)}
             >
-              Browse Menu
+              🏠 Back to Home
             </button>
           </div>
         </div>
@@ -146,46 +146,41 @@ export const OrderHistoryPage: React.FC = () => {
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
         <div className="p-4 pb-32 space-y-6"> {/* Bottom padding for sticky button */}
 
-          {orders.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-7xl mb-4">📋</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
-              <p className="text-gray-600 mb-6 text-lg">You haven't placed any orders. Start browsing our menu!</p>
+          {/* Empty State */}
+          {!loading && orders.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-8xl mb-6">🍽️</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">No Orders Yet</h3>
+              <p className="text-gray-600 mb-8 font-medium">Your order history will appear here once you place your first order!</p>
               <button 
-                className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-                onClick={() => navigate(`/${customerId}/menu`)}
+                className="bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+                onClick={() => navigate(`/${customerId}`)}
               >
-                Browse Menu
+                🏠 Back to Home
               </button>
             </div>
-          ) : (
+          )}
+
+          {/* Orders List */}
+          {!loading && orders.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold text-gray-900">Your Orders ({orders.length})</h2>
               
               {orders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6 border-2 border-fire-200 hover:shadow-xl transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-bold text-gray-900">Order #{order.orderNumber}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${getStatusColor(order.status)}`}>
-                          {getStatusIcon(order.status)} {order.status}
-                        </span>
-                      </div>
-                      
-                      <div className="text-sm text-gray-600 space-y-1 font-medium">
-                        <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
-                        <div>📍 {order.customerLocation?.address || 'Address not available'}</div>
-                        <div className="font-bold text-fire-600">💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
-                      </div>
+                  <div className="mb-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-bold text-gray-900">Order #{order.orderNumber}</h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${getStatusColor(order.status)}`}>
+                        {getStatusIcon(order.status)} {order.status}
+                      </span>
                     </div>
                     
-                    <button 
-                      className="ml-4 bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md transform active:scale-95"
-                      onClick={() => navigate(`/${customerId}/order-status/${order.id}`)}
-                    >
-                      View Details
-                    </button>
+                    <div className="text-sm text-gray-600 space-y-1 font-medium">
+                      <div>📅 {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</div>
+                      <div>📍 {order.customerLocation?.address || 'Address not available'}</div>
+                      <div className="font-bold text-fire-600">💰 ${order.total.toFixed(2)} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}</div>
+                    </div>
                   </div>
                   
                   {/* Order Items Preview */}
@@ -211,22 +206,13 @@ export const OrderHistoryPage: React.FC = () => {
                   </div>
                   
                   {/* Quick Actions */}
-                  <div className="flex gap-2 mt-4">
+                  <div className="mt-4">
                     <button 
-                      className="flex-1 bg-white text-fire-600 border-2 border-fire-500 text-sm font-bold px-4 py-2 rounded-lg hover:bg-fire-50 transition-all shadow-md"
+                      className="w-full bg-gradient-to-r from-fire-500 to-ember-500 hover:from-fire-600 hover:to-ember-600 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md transform active:scale-95"
                       onClick={() => navigate(`/${customerId}/order-status/${order.id}`)}
                     >
-                      📋 View Status
+                      📋 View Details
                     </button>
-                    
-                    {order.status === 'delivered' && (
-                      <button 
-                        className="flex-1 bg-gradient-to-r from-fire-500 to-ember-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:from-fire-600 hover:to-ember-600 transition-all shadow-md transform active:scale-95"
-                        onClick={() => navigate(`/${customerId}/menu`)}
-                      >
-                        🔄 Reorder
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -239,9 +225,9 @@ export const OrderHistoryPage: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
         <button 
           className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-          onClick={() => navigate(`/${customerId}/menu`)}
+          onClick={() => navigate(`/${customerId}`)}
         >
-          Browse Menu
+          🏠 Back to Home
         </button>
       </div>
     </div>

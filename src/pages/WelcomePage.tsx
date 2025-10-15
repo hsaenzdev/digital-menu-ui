@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
-import type { Customer, ApiResponse } from '../types'
+import type { Customer, ApiResponse, LocationData, Order } from '../types'
 
 type GeofenceStatus = 'checking' | 'allowed' | 'outside_zone' | 'no_location' | 'error'
 
@@ -20,12 +20,30 @@ interface DeliveryZoneValidation {
 export const WelcomePage: React.FC = () => {
   const navigate = useNavigate()
   const { customerId } = useParams<{ customerId: string }>()
-  const { setCustomer, setLocation } = useCustomer()
+  const { customer, setCustomer, setLocation, setCustomerLocationId } = useCustomer()
+  
+  // Page state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [geofenceStatus, setGeofenceStatus] = useState<GeofenceStatus>('checking')
   const [zoneInfo, setZoneInfo] = useState<DeliveryZoneValidation['data'] | null>(null)
+  
+  // Form state
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
+  const [locationData, setLocationData] = useState<LocationData | null>(null)
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [locationError, setLocationError] = useState('')
+  const [resolvedLocationId, setResolvedLocationId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
+  
+  // Active order state
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null)
+  
+  const hasCalledGeolocation = useRef(false)
 
+  // Fetch customer data
   useEffect(() => {
     const fetchCustomer = async () => {
       if (!customerId) {
@@ -40,6 +58,10 @@ export const WelcomePage: React.FC = () => {
 
         if (data.success && data.data) {
           setCustomer(data.data)
+          // Pre-fill name if customer already has one
+          if (data.data.name) {
+            setName(data.data.name)
+          }
         }
       } catch {
         setError('Failed to load customer information')
@@ -51,6 +73,31 @@ export const WelcomePage: React.FC = () => {
     fetchCustomer()
   }, [customerId, setCustomer])
 
+  // Check for active orders
+  useEffect(() => {
+    const checkActiveOrders = async () => {
+      if (!customer?.id) return
+      
+      try {
+        const response = await fetch(`/api/customers/${customer.id}/orders`)
+        const data: ApiResponse<Order[]> = await response.json()
+
+        if (data.success && data.data) {
+          // Find first active order (pending, confirmed, preparing, ready)
+          const active = data.data.find(order => 
+            ['pending', 'confirmed', 'preparing', 'ready'].includes(order.status)
+          )
+          setActiveOrder(active || null)
+        }
+      } catch (err) {
+        console.error('Failed to check active orders:', err)
+      }
+    }
+
+    checkActiveOrders()
+  }, [customer?.id])
+
+  // Geofencing check
   useEffect(() => {
     const checkGeofencing = async () => {
       if (!navigator.geolocation) {
@@ -75,11 +122,18 @@ export const WelcomePage: React.FC = () => {
               setGeofenceStatus('allowed')
               setZoneInfo(validation.data)
               
+              // Store initial GPS coordinates
               setLocation({
                 latitude,
                 longitude,
                 address: ''
               })
+
+              // Auto-resolve location for the form
+              if (!hasCalledGeolocation.current) {
+                hasCalledGeolocation.current = true
+                resolveCustomerLocation(latitude, longitude)
+              }
             } else {
               setGeofenceStatus('outside_zone')
               setZoneInfo(validation.data)
@@ -102,10 +156,136 @@ export const WelcomePage: React.FC = () => {
     if (!loading && !error) {
       checkGeofencing()
     }
-  }, [loading, error, setLocation])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, error])
 
-  const handleStartOrder = () => {
-    navigate(`/${customerId}/setup`)
+  // Resolve customer location (save/update in database)
+  const resolveCustomerLocation = async (latitude: number, longitude: number) => {
+    if (!customerId) return
+    
+    setLocationLoading(true)
+    setLocationError('')
+
+    try {
+      const response = await fetch(
+        `/api/customers/${customerId}/locations/resolve`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latitude, longitude })
+        }
+      )
+      
+      if (response.ok) {
+        const data = await response.json()
+        
+        if (data.success && data.location) {
+          setAddress(data.location.address || '')
+          setLocationData({
+            latitude,
+            longitude,
+            address: data.location.address || ''
+          })
+          setResolvedLocationId(data.location.id)
+          
+          if (data.location.isExisting && data.location.address) {
+            setLocationError('')
+          } else if (!data.location.address) {
+            setLocationError('GPS saved! Please enter your delivery address.')
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Location resolve error:', err)
+      setLocationError('Please enter your address manually.')
+    } finally {
+      setLocationLoading(false)
+    }
+  }
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newAddress = e.target.value
+    setAddress(newAddress)
+    
+    if (locationData) {
+      setLocationData({
+        ...locationData,
+        address: newAddress
+      })
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!name.trim()) {
+      setFormError('Please enter your name')
+      return
+    }
+
+    if (!address.trim()) {
+      setFormError('Please provide your delivery address')
+      return
+    }
+
+    if (!customer?.id) {
+      setFormError('No customer ID available. Please start from the link provided.')
+      return
+    }
+
+    setSaving(true)
+    setFormError('')
+
+    try {
+      const finalLocation: LocationData = locationData && locationData.latitude !== 0 
+        ? { ...locationData, address: address.trim() }
+        : {
+            latitude: 0,
+            longitude: 0,
+            address: address.trim()
+          }
+
+      // Update customer name
+      const nameResponse = await fetch(`/api/customers/${customer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() })
+      })
+
+      if (!nameResponse.ok) {
+        throw new Error('Failed to update customer')
+      }
+
+      // Update customer_location address if we have a resolved location
+      if (resolvedLocationId && address.trim()) {
+        const locationUpdateResponse = await fetch(
+          `/api/customers/${customer.id}/locations/${resolvedLocationId}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: address.trim() })
+          }
+        )
+
+        if (!locationUpdateResponse.ok) {
+          console.error('Failed to update location address')
+        }
+      }
+
+      // Save to context
+      setCustomer({ ...customer, name: name.trim() })
+      setLocation(finalLocation)
+      
+      if (resolvedLocationId) {
+        setCustomerLocationId(resolvedLocationId)
+      }
+
+      navigate(`/${customerId}/menu`)
+    } catch {
+      setFormError('Failed to save information. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleRetryLocation = () => {
@@ -113,6 +293,7 @@ export const WelcomePage: React.FC = () => {
     window.location.reload()
   }
 
+  // Loading state
   if (loading) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
@@ -126,6 +307,7 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // Error state
   if (error) {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
@@ -140,6 +322,7 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // Geofencing check in progress
   if (geofenceStatus === 'checking') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
@@ -159,6 +342,7 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // Outside delivery zone
   if (geofenceStatus === 'outside_zone') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
@@ -202,6 +386,7 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // No location permission
   if (geofenceStatus === 'no_location') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
@@ -238,6 +423,7 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // Geofencing error
   if (geofenceStatus === 'error') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
@@ -263,84 +449,172 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
+  // Main form (geofencing passed)
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-4 pb-32 space-y-4">
-          
-          {/* Welcome Message */}
-          <div className="text-center space-y-2 px-4 pt-2">
-            <h2 className="text-3xl font-bold text-white drop-shadow-lg">
-              Welcome to our restaurant!
-            </h2>
-            <p className="text-white/95 text-base font-medium drop-shadow">
-              Order your favorite meals with just a few taps
-            </p>
-          </div>
-
-          {/* Delivery Zone Confirmation */}
-          {zoneInfo?.zone && (
-            <div className="mx-4 bg-green-500/20 backdrop-blur border-2 border-green-300 rounded-xl p-3">
-              <div className="flex items-center gap-2 text-white mb-1">
-                <span className="text-xl">✅</span>
-                <span className="font-bold text-sm">Delivery Available</span>
-              </div>
-              <p className="text-white/90 text-xs">
-                {zoneInfo.zone.name} • {zoneInfo.city?.name}
-              </p>
-            </div>
-          )}
-          
-          {/* Features List */}
-          <div className="grid gap-3 px-4 max-w-lg mx-auto">
-            <div className="flex items-center gap-3 p-4 bg-white/95 backdrop-blur rounded-2xl border-2 border-fire-300 shadow-xl">
-              <span className="text-3xl">📱</span>
-              <div className="flex-1">
-                <div className="text-gray-800 font-bold text-base">Easy mobile ordering</div>
-                <div className="text-gray-600 text-xs">Browse and order in seconds</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-4 bg-white/95 backdrop-blur rounded-2xl border-2 border-fire-300 shadow-xl">
-              <span className="text-3xl">🚚</span>
-              <div className="flex-1">
-                <div className="text-gray-800 font-bold text-base">Fast delivery</div>
-                <div className="text-gray-600 text-xs">Hot food at your door</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-4 bg-white/95 backdrop-blur rounded-2xl border-2 border-fire-300 shadow-xl">
-              <span className="text-3xl">💳</span>
-              <div className="flex-1">
-                <div className="text-gray-800 font-bold text-base">Secure payment</div>
-                <div className="text-gray-600 text-xs">Safe and reliable checkout</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Info Footer */}
-          <div className="text-center space-y-1 px-4 pt-1">
-            <div className="flex items-center justify-center gap-2 text-white/90 font-medium text-sm drop-shadow">
-              <span>🕐</span>
-              <span>Open daily: 10:00 AM - 10:00 PM</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 text-white/90 font-medium text-sm drop-shadow">
-              <span>📞</span>
-              <span>Questions? Call (555) 123-4567</span>
-            </div>
-          </div>
+      {/* Header */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">🔥 Welcome!</h1>
+          <p className="text-fire-100 text-sm mt-1">Let's get your order started</p>
         </div>
       </div>
 
-      {/* Fixed Start Order Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <button 
-          className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-xl py-5 px-8 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
-          onClick={handleStartOrder}
-        >
-          🔥 Start Your Order
-        </button>
+      {/* Main Content - No Scrolling */}
+      <div className="flex-1 flex flex-col bg-gradient-to-b from-orange-50 to-white p-4">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col space-y-2.5">
+          {/* Name Input - Compact */}
+          <div className="bg-white rounded-lg shadow-sm p-3 border border-fire-200">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xl">👤</span>
+              <label htmlFor="name" className="font-bold text-gray-800 text-sm">
+                Your Name
+              </label>
+            </div>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your full name"
+              required
+              className="w-full px-3 py-2 border-2 border-fire-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium text-sm"
+            />
+          </div>
+
+          {/* Address Input - Compact */}
+          <div className="bg-white rounded-lg shadow-sm p-3 border border-fire-200 flex-1 flex flex-col">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">📍</span>
+                <label className="font-bold text-gray-800 text-sm">
+                  Delivery Address
+                </label>
+              </div>
+              {locationData && locationData.latitude !== 0 && (
+                <span className="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">GPS ✓</span>
+              )}
+            </div>
+
+            {locationLoading && (
+              <div className="flex items-center justify-center gap-2 mb-2 py-1">
+                <div className="w-4 h-4 border-2 border-fire-200 border-t-fire-600 rounded-full animate-spin"></div>
+                <p className="text-gray-600 text-xs font-medium">Getting location...</p>
+              </div>
+            )}
+
+            <textarea
+              className="w-full px-3 py-2 border-2 border-fire-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent font-medium resize-none text-sm flex-1"
+              placeholder="123 Main St, Apt 4B"
+              value={address}
+              onChange={handleAddressChange}
+              disabled={locationLoading}
+              required
+            />
+
+            {locationError && (
+              <div className="mt-1.5 bg-amber-50 border border-amber-300 rounded p-1.5">
+                <p className="text-amber-700 font-medium text-xs">💡 {locationError}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Error Display */}
+          {formError && (
+            <div className="bg-red-50 border border-red-300 rounded-lg p-2 flex items-center gap-2">
+              <span className="text-base">❌</span>
+              <span className="text-red-700 font-semibold text-xs">{formError}</span>
+            </div>
+          )}
+
+          {/* View Order History Button */}
+          {customer?.id && (
+            <button
+              type="button"
+              onClick={() => navigate(`/${customerId}/orders`)}
+              className="w-full bg-white/80 backdrop-blur text-fire-600 border border-fire-300 font-semibold py-2 px-4 rounded-lg hover:bg-white hover:border-fire-400 transition-all text-sm flex items-center justify-center gap-2"
+            >
+              <span className="text-base">📋</span>
+              <span>View Order History</span>
+            </button>
+          )}
+
+          {/* Active Order Alert */}
+          {activeOrder && (
+            <div className="bg-gradient-to-r from-fire-50 to-amber-50 border-2 border-fire-400 rounded-lg p-3 shadow-md">
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">🔥</span>
+                <div className="flex-1">
+                  <h4 className="font-bold text-fire-800 text-sm mb-1">
+                    Active Order in Progress
+                  </h4>
+                  <p className="text-fire-700 text-xs mb-2">
+                    Order #{activeOrder.orderNumber} • {activeOrder.status.charAt(0).toUpperCase() + activeOrder.status.slice(1)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/${customerId}/order-status/${activeOrder.id}`)}
+                    className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-xs py-2 px-3 rounded-lg hover:from-fire-600 hover:to-ember-600 transition-all shadow-md"
+                  >
+                    📋 View Order Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Spacer for future features */}
+          <div className="flex-1"></div>
+
+          {/* Info Section - Compact */}
+          <div className="bg-white/50 backdrop-blur rounded-lg px-3 py-2 border border-fire-200">
+            <div className="flex items-center justify-center gap-3 text-xs text-gray-700">
+              <div className="flex items-center gap-1">
+                <span className="text-sm">🕐</span>
+                <span className="font-medium">10:00 AM - 10:00 PM</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm">📞</span>
+                <span className="font-medium">(555) 123-4567</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {/* Fixed Bottom Button */}
+      <div className="flex-shrink-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl">
+        <div className="space-y-2">
+          <p className="text-xs text-gray-600 font-medium flex items-center justify-center gap-1.5">
+            <span className="text-sm">🔒</span>
+            <span>Your information is secure</span>
+          </p>
+          
+          <button 
+            type="submit"
+            onClick={handleSubmit}
+            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            disabled={saving || !name.trim() || !address.trim() || locationLoading || !!activeOrder}
+          >
+            {saving ? '⏳ Saving...' : 
+             activeOrder ? '🔒 Complete Active Order First' :
+             !name.trim() ? '👆 Enter Your Name Above' :
+             !address.trim() ? '👆 Enter Delivery Address Above' :
+             '🔥 Continue to Menu'}
+          </button>
+          
+          {activeOrder && (
+            <p className="text-xs text-center text-amber-700 font-semibold">
+              Please complete or cancel your active order before starting a new one
+            </p>
+          )}
+          
+          {(!name.trim() || !address.trim()) && !saving && !activeOrder && (
+            <p className="text-xs text-center text-gray-600">
+              Please complete all fields above to continue
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )

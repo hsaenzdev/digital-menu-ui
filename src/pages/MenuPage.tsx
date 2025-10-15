@@ -269,16 +269,34 @@ export const MenuPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Fixed Cart Button - Always visible at bottom */}
-      {getItemCount() > 0 && (
+      {/* Fixed Bottom Buttons */}
+      {getItemCount() > 0 ? (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
+          <div className="space-y-2">
+            <button 
+              className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all flex items-center justify-center gap-2"
+              onClick={goToCart}
+            >
+              <span className="text-2xl">🛒</span>
+              <span>View Cart ({getItemCount()} items)</span>
+              <span className="text-2xl">→</span>
+            </button>
+            
+            <button 
+              className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold text-lg py-3 px-6 rounded-xl shadow-md hover:bg-fire-50 transition-all"
+              onClick={() => navigate(`/${customerId}`)}
+            >
+              🏠 Back to Home
+            </button>
+          </div>
+        </div>
+      ) : (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
           <button 
-            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all flex items-center justify-center gap-2"
-            onClick={goToCart}
+            className="w-full bg-gradient-to-r from-fire-500 to-ember-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:from-fire-600 hover:to-ember-600 transform active:scale-95 transition-all"
+            onClick={() => navigate(`/${customerId}`)}
           >
-            <span className="text-2xl">🛒</span>
-            <span>View Cart ({getItemCount()} items)</span>
-            <span className="text-2xl">→</span>
+            🏠 Back to Home
           </button>
         </div>
       )}

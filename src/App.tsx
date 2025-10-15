@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { WelcomePage } from './pages/WelcomePage'
-import { CustomerSetupPage } from './pages/CustomerSetupPage'
 import { MenuPage } from './pages/MenuPage'
 import { CartPage } from './pages/CartPage'
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage'
@@ -42,7 +41,6 @@ function App() {
 
                 {/* Customer Routes - All include customerId */}
                 <Route path="/:customerId" element={<CustomerGuard><WelcomePage /></CustomerGuard>} />
-                <Route path="/:customerId/setup" element={<CustomerGuard><CustomerSetupPage /></CustomerGuard>} />
                 <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
                 <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
                 <Route path="/:customerId/order-confirmation" element={<CustomerGuard><OrderConfirmationPage /></CustomerGuard>} />
