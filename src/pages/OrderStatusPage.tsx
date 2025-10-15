@@ -148,18 +148,10 @@ export const OrderStatusPage: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
       {/* Fixed Header */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate(`/${customerId}/menu`)}
-          >
-            <span className="text-xl">←</span>
-            <span>Back</span>
-          </button>
-          <div className="w-12"></div> {/* Spacer for centering */}
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">📋 Order Status</h1>
+          <p className="text-fire-100 text-sm mt-1">Order #{order.orderNumber}</p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Status</h1>
-        <p className="text-fire-100 text-sm mt-1 text-center">Order #{order.orderNumber}</p>
       </div>
 
       {/* Scrollable Content Area */}

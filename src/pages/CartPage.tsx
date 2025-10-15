@@ -70,34 +70,28 @@ export const CartPage: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
       {/* Fixed Header */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate(`/${customerId}/menu`)}
-          >
-            <span className="text-xl">←</span>
-            <span className="hidden sm:inline">Back to Menu</span>
-          </button>
+        <div className="flex items-center justify-between mb-3">
           <div className="text-center flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">🛒 Your Cart</h1>
-            <p className="text-fire-100 text-sm">Review your order</p>
+            <p className="text-fire-100 text-sm mt-1">Review your order</p>
           </div>
           {cart.items.length > 0 && (
             <button 
-              className="text-white hover:text-red-200 font-medium flex items-center gap-1 transition-colors"
+              className="text-white hover:text-red-200 font-medium flex items-center gap-1.5 transition-colors ml-2"
               onClick={handleClearCart}
             >
               <span className="text-xl">🗑️</span>
-              <span className="hidden sm:inline">Clear</span>
+              <span className="hidden sm:inline text-sm">Clear</span>
             </button>
           )}
         </div>
 
         {/* Customer Summary */}
         {customer && location && (
-          <div className="flex gap-3 text-sm text-fire-50 mt-2 pt-2 border-t border-fire-400/30">
-            <span className="flex items-center gap-1 truncate">
-              👤 {customer.name}
+          <div className="flex justify-center gap-4 text-sm text-fire-50 pt-3 border-t border-fire-400/30">
+            <span className="flex items-center gap-1.5">
+              <span className="text-base">👤</span>
+              <span className="font-medium">{customer.name}</span>
             </span>
             <span className="flex items-center gap-1 truncate">
               📍 {location.address}
@@ -303,7 +297,7 @@ export const CartPage: React.FC = () => {
               className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
               onClick={handleContinueShopping}
             >
-              ← Continue Shopping
+              🍽️ Add More Items
             </button>
             
             {hasActiveOrders ? (

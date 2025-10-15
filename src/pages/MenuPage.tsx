@@ -136,32 +136,24 @@ export const MenuPage: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
       {/* Fixed Header */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate(`/${customerId}/setup`)}
-          >
-            <span className="text-xl">←</span>
-            <span className="hidden sm:inline">Back</span>
-          </button>
-          <div className="text-center flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">🔥 Our Menu</h1>
-            <p className="text-fire-100 text-sm">Delicious food delivered hot!</p>
-          </div>
-          <div className="w-16"></div>
+        <div className="text-center mb-3">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">🔥 Our Menu</h1>
+          <p className="text-fire-100 text-sm mt-1">Delicious food delivered hot!</p>
         </div>
 
         {/* Customer Summary */}
         {(customer || location) && (
-          <div className="flex gap-3 text-sm text-fire-50 mt-2 pt-2 border-t border-fire-400/30">
+          <div className="flex justify-center gap-4 text-sm text-fire-50 pt-3 border-t border-fire-400/30">
             {customer && (
-              <span className="flex items-center gap-1 truncate">
-                👤 {customer.name}
+              <span className="flex items-center gap-1.5">
+                <span className="text-base">👤</span>
+                <span className="font-medium">{customer.name}</span>
               </span>
             )}
             {location && (
-              <span className="flex items-center gap-1 truncate">
-                📍 {location.address}
+              <span className="flex items-center gap-1.5">
+                <span className="text-base">📍</span>
+                <span className="font-medium truncate max-w-[200px]">{location.address}</span>
               </span>
             )}
           </div>

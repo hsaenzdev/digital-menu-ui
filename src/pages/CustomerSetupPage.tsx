@@ -245,16 +245,11 @@ export const CustomerSetupPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600">
       {/* Fixed Header */}
-      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-3 shadow-lg">
-        <button 
-          className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors mb-2"
-          onClick={() => navigate(-1)}
-        >
-          <span className="text-xl">←</span>
-          <span>Back</span>
-        </button>
-        <h1 className="text-xl sm:text-2xl font-bold drop-shadow-md">🚀 Let's Get Started</h1>
-        <p className="text-fire-100 text-xs mt-1">Just a few details to begin your order</p>
+      <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">� Let's Get Started</h1>
+          <p className="text-fire-100 text-sm mt-1">Tell us about yourself</p>
+        </div>
       </div>
 
       {/* Main Content - No Scroll Needed */}

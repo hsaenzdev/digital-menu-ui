@@ -188,18 +188,10 @@ export const OrderConfirmationPage: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
       {/* Fixed Header */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-4 py-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            className="text-white hover:text-fire-100 font-medium flex items-center gap-2 transition-colors"
-            onClick={() => navigate(`/${customerId}/cart`)}
-          >
-            <span className="text-xl">←</span>
-            <span>Back</span>
-          </button>
-          <div className="w-12"></div> {/* Spacer for centering */}
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md">📋 Order Confirmation</h1>
+          <p className="text-fire-100 text-sm mt-1">Review and submit your order</p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md text-center">📋 Order Confirmation</h1>
-        <p className="text-fire-100 text-sm mt-1 text-center">Review and submit your order</p>
       </div>
 
       {/* Scrollable Content Area */}
@@ -305,27 +297,17 @@ export const OrderConfirmationPage: React.FC = () => {
 
       {/* Fixed Action Buttons */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-fire-400 p-4 shadow-2xl z-50">
-        <div className="space-y-2">
-          <button 
-            className="w-full bg-white text-fire-600 border-2 border-fire-500 font-bold py-3 px-6 rounded-xl hover:bg-fire-50 transition-all shadow-md"
-            onClick={() => navigate(`/${customerId}/cart`)}
-            disabled={isSubmitting}
-          >
-            Back to Cart
-          </button>
-          
-          <button 
-            className={`w-full font-bold text-lg py-4 px-6 rounded-xl shadow-lg transition-all ${
-              isSubmitting 
-                ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transform active:scale-95'
-            }`}
-            onClick={handleSubmitOrder}
-            disabled={isSubmitting}
-          >
+        <button 
+          className={`w-full font-bold text-lg py-4 px-6 rounded-xl shadow-lg transition-all ${
+            isSubmitting 
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+              : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transform active:scale-95'
+          }`}
+          onClick={handleSubmitOrder}
+          disabled={isSubmitting}
+        >
             {isSubmitting ? '⏳ Submitting Order...' : '✅ Submit Order'}
-          </button>
-        </div>
+        </button>
       </div>
     </div>
   )
