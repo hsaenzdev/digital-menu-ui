@@ -20,7 +20,7 @@ export const CustomerSetupPage: React.FC = () => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  // Ref to prevent duplicate geocoding calls (React StrictMode causes double mount)
+  // Ref to prevent duplicate location calls (React StrictMode causes double mount)
   const hasCalledGeolocation = useRef(false)
 
   // Pre-fill name if customer already has one
@@ -79,12 +79,17 @@ export const CustomerSetupPage: React.FC = () => {
               })
               setResolvedLocationId(data.location.id) // Store the location ID
               
-              // Show helpful message to user
+              // Show helpful message based on what happened
               if (data.location.isExisting) {
-                setLocationError('') // Clear any errors
+                setLocationError('') // Clear any errors - existing location found
+              } else if (!data.location.address) {
+                // New location created but no address yet
+                setLocationError('GPS location saved! Please enter your delivery address below.')
+              } else {
+                setLocationError('') // New location with address provided
               }
             } else {
-              setLocationError(data.error || 'Could not resolve location. Please enter manually.')
+              setLocationError(data.error || 'Could not save location. Please try again.')
               setLocationData({
                 latitude,
                 longitude,
@@ -92,7 +97,7 @@ export const CustomerSetupPage: React.FC = () => {
               })
             }
           } else {
-            setLocationError('Could not resolve location. Please enter manually.')
+            setLocationError('Could not save location. Please try again.')
             setLocationData({
               latitude,
               longitude,
@@ -103,7 +108,7 @@ export const CustomerSetupPage: React.FC = () => {
           setLocationLoading(false)
         } catch (err) {
           console.error('Location resolve error:', err)
-          setLocationError('Could not resolve location. Please enter manually.')
+          setLocationError('Could not save location. Please enter your address manually.')
           setLocationData({
             latitude,
             longitude,
