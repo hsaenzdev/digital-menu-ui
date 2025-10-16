@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCog } from '@fortawesome/free-solid-svg-icons'
 import { useCart } from '../context/CartContext'
 import { useActiveOrders } from '../hooks/useActiveOrders'
 
@@ -69,29 +71,29 @@ export const CartPage: React.FC = () => {
       {/* Header - Consistent */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
         <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(`/${customerId}`)}
+            className="flex items-center justify-center w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg transition-all active:scale-95 border border-white/20"
+            title="Settings"
+          >
+            <FontAwesomeIcon icon={faCog} className="text-base" />
+          </button>
           <h1 className="text-lg font-bold drop-shadow-md text-center flex-1">
             🛒 Your Cart {cart.items.length > 0 && `(${cart.items.length})`}
           </h1>
-          {cart.items.length > 0 && (
+          {cart.items.length > 0 ? (
             <button 
-              className="text-white hover:text-red-200 font-medium flex items-center gap-1 transition-colors text-xs"
+              className="text-white hover:text-red-200 font-medium flex items-center gap-1 transition-colors text-xs w-9 justify-end"
               onClick={handleClearCart}
             >
               <span className="text-base">🗑️</span>
               <span>Clear</span>
             </button>
+          ) : (
+            <div className="w-9"></div>
           )}
         </div>
       </div>
-
-      {/* Floating Home Button */}
-      <button
-        onClick={() => navigate(`/${customerId}`)}
-        className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
-        title="Back to Home"
-      >
-        🏠
-      </button>
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">

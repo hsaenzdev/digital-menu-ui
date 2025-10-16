@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCog } from '@fortawesome/free-solid-svg-icons'
 import type { Order } from '../types'
 
 export const OrderStatusPage: React.FC = () => {
@@ -121,18 +123,19 @@ export const OrderStatusPage: React.FC = () => {
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
         {/* Header - Consistent */}
         <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
-          <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order Status</h1>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate(`/${customerId}`)}
+              className="flex items-center justify-center w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg transition-all active:scale-95 border border-white/20"
+              title="Settings"
+            >
+              <FontAwesomeIcon icon={faCog} className="text-base" />
+            </button>
+            <h1 className="text-lg font-bold drop-shadow-md text-center flex-1">📋 Order Status</h1>
+            <div className="w-9"></div>
+          </div>
         </div>
 
-        {/* Floating Home Button */}
-        <button
-          onClick={() => navigate(`/${customerId}`)}
-          className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
-          title="Back to Home"
-        >
-          🏠
-        </button>
-        
         {/* Error Content */}
         <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
           <div className="text-center py-8 px-3">
@@ -155,17 +158,18 @@ export const OrderStatusPage: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
       {/* Header - Consistent */}
       <div className="flex-shrink-0 bg-gradient-to-r from-fire-600 to-ember-600 text-white px-3 py-2.5 shadow-lg">
-        <h1 className="text-lg font-bold text-center drop-shadow-md">📋 Order #{order.orderNumber}</h1>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(`/${customerId}`)}
+            className="flex items-center justify-center w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg transition-all active:scale-95 border border-white/20"
+            title="Settings"
+          >
+            <FontAwesomeIcon icon={faCog} className="text-base" />
+          </button>
+          <h1 className="text-lg font-bold drop-shadow-md text-center flex-1">📋 Order #{order.id}</h1>
+          <div className="w-9"></div>
+        </div>
       </div>
-
-      {/* Floating Home Button */}
-      <button
-        onClick={() => navigate(`/${customerId}`)}
-        className="fixed top-16 left-3 z-40 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:bg-gray-50 transition-all border-2 border-fire-400"
-        title="Back to Home"
-      >
-        🏠
-      </button>
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-orange-50 to-white">
