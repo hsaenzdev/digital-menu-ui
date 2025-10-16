@@ -124,14 +124,6 @@ export interface Order {
   updatedAt: Date
 }
 
-export interface BankTransferSettings {
-  enabled: boolean
-  bankName: string
-  accountNumber: string
-  accountHolder: string
-  instructions: string
-}
-
 // API Response types
 export interface ApiResponse<T> {
   success: boolean
