@@ -3,7 +3,16 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomer } from '../context/CustomerContext'
 import type { Customer, ApiResponse, LocationData, Order } from '../types'
 
-type GeofenceStatus = 'checking' | 'allowed' | 'outside_zone' | 'no_location' | 'error'
+type ValidationStatus = 
+  | 'loading' 
+  | 'customer_disabled' 
+  | 'restaurant_closed' 
+  | 'checking_location' 
+  | 'outside_city'
+  | 'outside_zone' 
+  | 'no_location' 
+  | 'error' 
+  | 'allowed'
 
 interface DeliveryZoneValidation {
   success: boolean
@@ -25,8 +34,13 @@ export const WelcomePage: React.FC = () => {
   // Page state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [geofenceStatus, setGeofenceStatus] = useState<GeofenceStatus>('checking')
+  const [validationStatus, setValidationStatus] = useState<ValidationStatus>('loading')
   const [zoneInfo, setZoneInfo] = useState<DeliveryZoneValidation['data'] | null>(null)
+  const [restaurantStatus, setRestaurantStatus] = useState<{
+    isOpen: boolean
+    message: string
+    nextOpening: { day: string; time: string; hoursUntil: number; minutesUntil: number } | null
+  } | null>(null)
   
   // Form state
   const [name, setName] = useState('')
@@ -89,75 +103,115 @@ export const WelcomePage: React.FC = () => {
           )
           setActiveOrder(active || null)
         }
-      } catch (err) {
-        console.error('Failed to check active orders:', err)
+      } catch {
+        // Silently fail - active orders are optional information
       }
     }
 
     checkActiveOrders()
   }, [customer?.id])
 
-  // Geofencing check
+  // Comprehensive validation flow (4 layers)
   useEffect(() => {
-    const checkGeofencing = async () => {
-      if (!navigator.geolocation) {
-        setGeofenceStatus('no_location')
-        return
-      }
+    const performValidation = async () => {
+      if (!customer?.id) return
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords
+      try {
+        // Layer 1: Check customer status
+        setValidationStatus('loading')
+        const customerStatusResponse = await fetch(`/api/business/customer/${customer.id}/status`)
+        const customerValidation = await customerStatusResponse.json()
 
-          try {
-            const response = await fetch('/api/geofencing/validate-delivery-zone', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ latitude, longitude })
-            })
+        if (!customerValidation.success || !customerValidation.data.canOrder) {
+          setValidationStatus('customer_disabled')
+          return
+        }
 
-            const validation: DeliveryZoneValidation = await response.json()
+        // Layer 2: Check business hours
+        const restaurantStatusResponse = await fetch('/api/business/status')
+        const businessValidation = await restaurantStatusResponse.json()
 
-            if (validation.success && validation.withinDeliveryZone) {
-              setGeofenceStatus('allowed')
-              setZoneInfo(validation.data)
-              
-              // Store initial GPS coordinates
-              setLocation({
-                latitude,
-                longitude,
-                address: ''
+        if (!businessValidation.success) {
+          setValidationStatus('error')
+          return
+        }
+
+        setRestaurantStatus(businessValidation.data)
+
+        if (!businessValidation.data.isOpen) {
+          setValidationStatus('restaurant_closed')
+          return
+        }
+
+        // Layer 3 & 4: Check geofencing (city and delivery zone)
+        setValidationStatus('checking_location')
+
+        if (!navigator.geolocation) {
+          setValidationStatus('no_location')
+          return
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords
+
+            try {
+              const response = await fetch('/api/geofencing/validate-delivery-zone', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude, longitude })
               })
 
-              // Auto-resolve location for the form
-              if (!hasCalledGeolocation.current) {
-                hasCalledGeolocation.current = true
-                resolveCustomerLocation(latitude, longitude)
+              const validation: DeliveryZoneValidation = await response.json()
+
+              if (validation.success && validation.withinDeliveryZone) {
+                setValidationStatus('allowed')
+                setZoneInfo(validation.data)
+                
+                // Store initial GPS coordinates
+                setLocation({
+                  latitude,
+                  longitude,
+                  address: ''
+                })
+
+                // Auto-resolve location for the form
+                if (!hasCalledGeolocation.current) {
+                  hasCalledGeolocation.current = true
+                  resolveCustomerLocation(latitude, longitude)
+                }
+              } else {
+                // Check if it's a city issue or zone issue
+                if (validation.data.reason === 'CITY_NOT_FOUND' || validation.data.reason === 'OUTSIDE_CITY') {
+                  setValidationStatus('outside_city')
+                } else {
+                  setValidationStatus('outside_zone')
+                }
+                setZoneInfo(validation.data)
               }
-            } else {
-              setGeofenceStatus('outside_zone')
-              setZoneInfo(validation.data)
+            } catch {
+              setValidationStatus('error')
             }
-          } catch {
-            setGeofenceStatus('error')
+          },
+          () => {
+            setValidationStatus('no_location')
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
           }
-        },
-        () => {
-          setGeofenceStatus('no_location')
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
-        }
-      )
+        )
+      } catch {
+        setValidationStatus('error')
+      }
     }
 
     if (!loading && !error) {
-      checkGeofencing()
+      performValidation()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, error])
+  }, [loading, error, customer?.id])
 
   // Resolve customer location (save/update in database)
   const resolveCustomerLocation = async (latitude: number, longitude: number) => {
@@ -195,8 +249,7 @@ export const WelcomePage: React.FC = () => {
           }
         }
       }
-    } catch (err) {
-      console.error('Location resolve error:', err)
+    } catch {
       setLocationError('Please enter your address manually.')
     } finally {
       setLocationLoading(false)
@@ -268,7 +321,7 @@ export const WelcomePage: React.FC = () => {
         )
 
         if (!locationUpdateResponse.ok) {
-          console.error('Failed to update location address')
+          // Silently fail - not critical
         }
       }
 
@@ -289,7 +342,7 @@ export const WelcomePage: React.FC = () => {
   }
 
   const handleRetryLocation = () => {
-    setGeofenceStatus('checking')
+    setValidationStatus('loading')
     window.location.reload()
   }
 
@@ -322,28 +375,163 @@ export const WelcomePage: React.FC = () => {
     )
   }
 
-  // Geofencing check in progress
-  if (geofenceStatus === 'checking') {
+  // Customer disabled state
+  if (validationStatus === 'customer_disabled') {
     return (
-      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center">
-            <div className="relative">
-              <div className="text-8xl mb-6">📍</div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-32 h-32 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-              </div>
+      <div className="h-screen flex flex-col bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 overflow-hidden p-6">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-8xl mb-6">🚫</div>
+            <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+              Account Suspended
+            </h2>
+            <p className="text-white/90 text-lg mb-6 drop-shadow">
+              Your account has been temporarily suspended. Please contact our support team for assistance.
+            </p>
+            
+            <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+              <p className="text-white/80 text-sm font-semibold mb-2">Need Help?</p>
+              <p className="text-white/70 text-xs mb-1">📞 Call: (555) 123-4567</p>
+              <p className="text-white/70 text-xs">📧 Email: support@restaurant.com</p>
             </div>
-            <p className="text-white text-2xl font-bold mt-12">Checking your location...</p>
-            <p className="text-white/80 text-sm mt-2">Making sure we can deliver to you</p>
+
+            <button 
+              className="w-full bg-white/20 text-white border border-white/30 font-bold text-lg py-4 px-6 rounded-xl hover:bg-white/30 transform active:scale-95 transition-all"
+              onClick={handleRetryLocation}
+            >
+              🔄 Refresh
+            </button>
           </div>
         </div>
       </div>
     )
   }
 
-  // Outside delivery zone
-  if (geofenceStatus === 'outside_zone') {
+  // Restaurant closed state
+  if (validationStatus === 'restaurant_closed' && restaurantStatus) {
+    const { message, nextOpening } = restaurantStatus
+    
+    return (
+      <div className="h-screen flex flex-col bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-600 overflow-hidden p-6">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-8xl mb-6">🕐</div>
+            <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+              We're Currently Closed
+            </h2>
+            <p className="text-white/90 text-lg mb-6 drop-shadow">
+              {message}
+            </p>
+            
+            {nextOpening && (
+              <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+                <p className="text-white/80 text-sm font-semibold mb-2">Next Opening:</p>
+                <p className="text-white text-xl font-bold mb-1">
+                  {nextOpening.day} at {nextOpening.time}
+                </p>
+                <p className="text-white/70 text-xs">
+                  {nextOpening.hoursUntil > 0 
+                    ? `In ${nextOpening.hoursUntil}h ${nextOpening.minutesUntil}m`
+                    : `In ${nextOpening.minutesUntil} minutes`
+                  }
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button 
+                className="w-full bg-white text-indigo-600 font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-indigo-50 transform active:scale-95 transition-all"
+                onClick={handleRetryLocation}
+              >
+                🔄 Check Again
+              </button>
+              
+              <div className="text-white/80 text-sm">
+                <p className="mb-2">📞 Questions?</p>
+                <p className="text-white/60 text-xs">Call us: (555) 123-4567</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Checking location state
+  if (validationStatus === 'checking_location' || validationStatus === 'loading') {
+    return (
+      <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="relative">
+              <div className="text-8xl mb-6">
+                {validationStatus === 'loading' ? '🔥' : '📍'}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-32 h-32 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
+            </div>
+            <p className="text-white text-2xl font-bold mt-12">
+              {validationStatus === 'loading' ? 'Verifying access...' : 'Checking your location...'}
+            </p>
+            <p className="text-white/80 text-sm mt-2">
+              {validationStatus === 'loading' 
+                ? 'Please wait a moment' 
+                : 'Making sure we can deliver to you'
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Outside city zone
+  if (validationStatus === 'outside_city') {
+    return (
+      <div className="h-screen flex flex-col bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 overflow-hidden p-6">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-8xl mb-6">🌍</div>
+            <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+              We're Not in Your City Yet
+            </h2>
+            <p className="text-white/90 text-lg mb-6 drop-shadow">
+              {zoneInfo?.message || "We don't currently operate in your city."}
+            </p>
+            
+            {zoneInfo?.city && (
+              <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+                <p className="text-white/80 text-sm">
+                  <span className="font-semibold">Your Location:</span> {zoneInfo.city.name}
+                </p>
+                <p className="text-white/70 text-xs mt-1">
+                  We're working hard to expand to your area!
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button 
+                className="w-full bg-white text-orange-600 font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-orange-50 transform active:scale-95 transition-all"
+                onClick={handleRetryLocation}
+              >
+                🔄 Try Again
+              </button>
+              
+              <div className="text-white/80 text-sm">
+                <p className="mb-2">📧 Want us in your city?</p>
+                <p className="text-white/60 text-xs">Email: expansion@restaurant.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Outside delivery zone (but within city)
+  if (validationStatus === 'outside_zone') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
         <div className="flex-1 flex items-center justify-center">
@@ -387,7 +575,7 @@ export const WelcomePage: React.FC = () => {
   }
 
   // No location permission
-  if (geofenceStatus === 'no_location') {
+  if (validationStatus === 'no_location') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
         <div className="flex-1 flex items-center justify-center">
@@ -424,7 +612,7 @@ export const WelcomePage: React.FC = () => {
   }
 
   // Geofencing error
-  if (geofenceStatus === 'error') {
+  if (validationStatus === 'error') {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
         <div className="flex-1 flex items-center justify-center">
