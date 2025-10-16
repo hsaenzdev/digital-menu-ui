@@ -26,9 +26,14 @@ export interface Order {
   tax: number
   tip: number
   status: string
+  paymentMethod?: 'cash' | 'bank_transfer'
+  paymentStatus?: 'pending' | 'confirmed' | 'failed'
+  transferReference?: string
+  transferConfirmedAt?: string
+  transferConfirmedBy?: string
   createdAt: string
   updatedAt: string
   items: OrderItem[]
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
+export type OrderStatus = 'pending_payment' | 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'

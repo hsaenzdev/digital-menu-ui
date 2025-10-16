@@ -1,10 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCog } from '@fortawesome/free-solid-svg-icons'
 import { useCart } from '../context/CartContext'
 import { useCustomer } from '../context/CustomerContext'
-import type { Order } from '../types'
+import type { Order, PaymentMethod, ApiResponse } from '../types'
+
+interface BankSettings {
+  bankTransferEnabled: boolean
+  bankName: string
+  bankAccountNumber: string
+  bankAccountHolder: string
+  bankTransferInstructions: string
+}
 
 export const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate()
@@ -14,9 +22,40 @@ export const OrderConfirmationPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
+  const [bankSettings, setBankSettings] = useState<BankSettings | null>(null)
 
   const hasCartItems = cart && cart.items && Array.isArray(cart.items) && cart.items.length > 0
   const hasCustomerInfo = customer?.id && customer?.name
+
+  // Fetch bank settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/public/bank-transfer')
+        if (response.ok) {
+          const data = await response.json()
+          setBankSettings({
+            bankTransferEnabled: data.bankTransferEnabled ?? false,
+            bankName: data.bankName || '',
+            bankAccountNumber: data.bankAccountNumber || '',
+            bankAccountHolder: data.bankAccountHolder || '',
+            bankTransferInstructions: data.bankTransferInstructions || ''
+          })
+        }
+      } catch {
+        // Use defaults if fetch fails
+        setBankSettings({
+          bankTransferEnabled: false,
+          bankName: '',
+          bankAccountNumber: '',
+          bankAccountHolder: '',
+          bankTransferInstructions: ''
+        })
+      }
+    }
+    fetchSettings()
+  }, [])
 
   const calculateTotal = () => {
     if (!hasCartItems) return 0
@@ -39,13 +78,14 @@ export const OrderConfirmationPage: React.FC = () => {
 
     try {
       const orderData = {
-        customerId, // Link order to customer
-        customerLocationId, // Required: Reference to customer_locations table
+        customerId,
+        customerLocationId,
         items: cart.items,
         subtotal: cart.subtotal,
         tax: cart.tax,
         tip: cart.tip,
         total: calculateTotal(),
+        paymentMethod
       }
 
       const response = await fetch('/api/orders', {
@@ -56,13 +96,13 @@ export const OrderConfirmationPage: React.FC = () => {
         body: JSON.stringify(orderData),
       })
 
-      const result = await response.json()
+      const result: ApiResponse<Order> = await response.json()
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || 'Failed to submit order')
       }
 
-      setSubmittedOrder(result.data)
+      setSubmittedOrder(result.data!)
       clearCart()
 
     } catch (err) {
@@ -70,6 +110,12 @@ export const OrderConfirmationPage: React.FC = () => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // If order submitted and it's bank transfer with pending payment, redirect to payment pending page
+  if (submittedOrder && submittedOrder.paymentMethod === 'bank_transfer' && submittedOrder.status === 'pending_payment') {
+    navigate(`/${customerId}/payment-pending/${submittedOrder.id}`)
+    return null
   }
 
   if (submittedOrder) {
@@ -310,6 +356,67 @@ export const OrderConfirmationPage: React.FC = () => {
                 <span className="text-gray-900">Total:</span>
                 <span className="text-fire-600">${calculateTotal().toFixed(2)}</span>
               </div>
+            </div>
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="bg-white rounded-xl shadow-md p-3 border border-fire-200">
+            <h3 className="font-bold text-gray-900 mb-2.5 text-sm">💳 Payment Method</h3>
+            
+            <div className="space-y-2">
+              {/* Cash Payment */}
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('cash')}
+                className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                  paymentMethod === 'cash'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-300 bg-white hover:border-green-300'
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">💵</span>
+                      <span className="font-bold text-gray-900 text-sm">Cash on Delivery</span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1 ml-7">Pay when your order arrives</p>
+                  </div>
+                  {paymentMethod === 'cash' && (
+                    <div className="ml-2">
+                      <span className="text-green-600 text-lg">✓</span>
+                    </div>
+                  )}
+                </div>
+              </button>
+
+              {/* Bank Transfer Payment */}
+              {bankSettings?.bankTransferEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('bank_transfer')}
+                  className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                    paymentMethod === 'bank_transfer'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-300 bg-white hover:border-blue-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">🏦</span>
+                        <span className="font-bold text-gray-900 text-sm">Bank Transfer</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1 ml-7">Transfer now, we'll confirm</p>
+                    </div>
+                    {paymentMethod === 'bank_transfer' && (
+                      <div className="ml-2">
+                        <span className="text-blue-600 text-lg">✓</span>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 

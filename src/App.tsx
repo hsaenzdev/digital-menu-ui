@@ -3,6 +3,7 @@ import { WelcomePage } from './pages/WelcomePage'
 import { MenuPage } from './pages/MenuPage'
 import { CartPage } from './pages/CartPage'
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage'
+import { PaymentPendingPage } from './pages/PaymentPendingPage'
 import { OrderStatusPage } from './pages/OrderStatusPage'
 import { OrderHistoryPage } from './pages/OrderHistoryPage'
 import { CartProvider } from './context/CartContext'
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
                 <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
                 <Route path="/:customerId/order-confirmation" element={<CustomerGuard><OrderConfirmationPage /></CustomerGuard>} />
+                <Route path="/:customerId/payment-pending/:orderId" element={<CustomerGuard><PaymentPendingPage /></CustomerGuard>} />
                 <Route path="/:customerId/order-status/:orderId" element={<CustomerGuard><OrderStatusPage /></CustomerGuard>} />
                 <Route path="/:customerId/orders" element={<CustomerGuard><OrderHistoryPage /></CustomerGuard>} />
                 

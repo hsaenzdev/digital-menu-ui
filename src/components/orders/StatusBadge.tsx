@@ -1,6 +1,6 @@
 import React from 'react'
 
-type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
+type OrderStatus = 'pending_payment' | 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
 
 interface StatusBadgeProps {
   status: OrderStatus
@@ -8,6 +8,10 @@ interface StatusBadgeProps {
 }
 
 const statusConfig: Record<OrderStatus, { label: string; colors: string }> = {
+  pending_payment: {
+    label: 'Awaiting Payment',
+    colors: 'bg-orange-100 text-orange-800 border-orange-300'
+  },
   pending: {
     label: 'New Order',
     colors: 'bg-yellow-100 text-yellow-800 border-yellow-300'

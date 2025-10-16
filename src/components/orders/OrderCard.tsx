@@ -73,6 +73,16 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
         </div>
       </div>
 
+      {/* Payment Method Indicator */}
+      {order.paymentMethod === 'bank_transfer' && (
+        <div className="mb-3">
+          <span className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-300">
+            🏦 Bank Transfer
+            {order.transferReference && ` • ${order.transferReference}`}
+          </span>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
         <span className="text-lg font-bold text-gray-900">

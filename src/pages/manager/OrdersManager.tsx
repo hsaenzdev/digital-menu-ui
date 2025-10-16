@@ -6,11 +6,11 @@ import { useAuth } from '../../context/AuthContext'
 import type { Order, OrderStatus } from '../../types/orders'
 
 // Configuration constants
-const API_URL = 'http://localhost:3000/api/orders-manager'
 const AUTO_REFRESH_INTERVAL = 30000 // 30 seconds
 const STATUS_UPDATE_DEBOUNCE = 1000 // 1 second delay after status change before refreshing
 
 const KANBAN_COLUMNS: Array<{ status: OrderStatus; title: string; icon: string; color: string }> = [
+  { status: 'pending_payment', title: 'Awaiting Payment', icon: '💳', color: 'border-orange-300 bg-orange-50' },
   { status: 'pending', title: 'New Orders', icon: '🔔', color: 'border-yellow-300 bg-yellow-50' },
   { status: 'confirmed', title: 'Confirmed', icon: '✅', color: 'border-blue-300 bg-blue-50' },
   { status: 'preparing', title: 'In Kitchen', icon: '🍳', color: 'border-purple-300 bg-purple-50' },
@@ -36,7 +36,7 @@ export const OrdersManager: React.FC = () => {
         setIsRefreshing(true)
       }
       setError(null) // Clear previous errors
-      const response = await fetch(`${API_URL}/orders`, {
+      const response = await fetch('/api/orders-manager/orders', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -72,7 +72,7 @@ export const OrdersManager: React.FC = () => {
     if (!token) return
 
     try {
-      const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
+      const response = await fetch(`/api/orders-manager/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export const OrdersManager: React.FC = () => {
 
     try {
       // Fetch full order details to ensure we have parsed modifiers
-      const response = await fetch(`${API_URL}/orders/${order.id}`, {
+      const response = await fetch(`/api/orders-manager/orders/${order.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -194,7 +194,7 @@ export const OrdersManager: React.FC = () => {
         </div>
 
         {/* Kanban Board */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 flex-1 overflow-hidden">
           {KANBAN_COLUMNS.map(column => {
             const columnOrders = getOrdersByStatus(column.status)
             return (

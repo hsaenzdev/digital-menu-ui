@@ -414,13 +414,30 @@ export const WelcomePage: React.FC = () => {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-600 overflow-hidden p-6">
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md">
+          <div className="text-center max-w-md w-full">
             <div className="text-8xl mb-6">🕐</div>
             <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
               We're Currently Closed
             </h2>
+            
+            {/* Active Order Notice */}
+            {activeOrder && (
+              <div className="bg-green-500/20 backdrop-blur border-2 border-green-300/50 rounded-xl p-4 mb-4">
+                <div className="text-5xl mb-2">✅</div>
+                <p className="text-white font-bold text-lg mb-2">
+                  Don't Worry!
+                </p>
+                <p className="text-white/90 text-sm">
+                  We're closed for new orders, but we're still preparing and will deliver your active order #{activeOrder.orderNumber}!
+                </p>
+              </div>
+            )}
+            
             <p className="text-white/90 text-lg mb-6 drop-shadow">
-              {message}
+              {activeOrder 
+                ? "You can't place new orders right now, but you can check your order status below."
+                : message
+              }
             </p>
             
             {nextOpening && (
@@ -439,6 +456,25 @@ export const WelcomePage: React.FC = () => {
             )}
 
             <div className="space-y-3">
+              {/* Order Status Button - Show if active order exists */}
+              {activeOrder && (
+                <button 
+                  className="w-full bg-green-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-green-600 transform active:scale-95 transition-all"
+                  onClick={() => navigate(`/customer/${customerId}/order-status/${activeOrder.id}`)}
+                >
+                  📦 Track My Order #{activeOrder.orderNumber}
+                </button>
+              )}
+              
+              {/* Order History Button */}
+              <button 
+                className="w-full bg-white/20 backdrop-blur text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-white/30 border-2 border-white/40 transform active:scale-95 transition-all"
+                onClick={() => navigate(`/customer/${customerId}/orders`)}
+              >
+                📜 View Order History
+              </button>
+              
+              {/* Check Again Button */}
               <button 
                 className="w-full bg-white text-indigo-600 font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-indigo-50 transform active:scale-95 transition-all"
                 onClick={handleRetryLocation}
@@ -446,7 +482,7 @@ export const WelcomePage: React.FC = () => {
                 🔄 Check Again
               </button>
               
-              <div className="text-white/80 text-sm">
+              <div className="text-white/80 text-sm mt-4">
                 <p className="mb-2">📞 Questions?</p>
                 <p className="text-white/60 text-xs">Call us: (555) 123-4567</p>
               </div>

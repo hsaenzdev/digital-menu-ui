@@ -35,6 +35,13 @@ interface Settings {
   currencyCode: string
   tipSuggestions: number[]
   
+  // Payment Methods
+  bankTransferEnabled: boolean
+  bankName?: string
+  bankAccountNumber?: string
+  bankAccountHolder?: string
+  bankTransferInstructions?: string
+  
   // Delivery Settings
   baseDeliveryFee: number
   freeDeliveryThreshold?: number
@@ -94,7 +101,7 @@ export const SettingsPage: React.FC = () => {
     if (!token) return
     
     try {
-      const response = await fetch('http://localhost:3000/api/settings', {
+      const response = await fetch('/api/settings', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -124,7 +131,7 @@ export const SettingsPage: React.FC = () => {
     setSuccessMessage(null)
 
     try {
-      const response = await fetch('http://localhost:3000/api/settings', {
+      const response = await fetch('/api/settings', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -530,6 +537,76 @@ export const SettingsPage: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Bank Transfer Payment Settings */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4">🏦 Bank Transfer Payment</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="bankTransferEnabled"
+                            checked={settings.bankTransferEnabled || false}
+                            onChange={(e) => updateField('bankTransferEnabled', e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="bankTransferEnabled" className="ml-2 text-sm font-medium text-gray-700">
+                            Enable Bank Transfer as Payment Method
+                          </label>
+                        </div>
+
+                        {settings.bankTransferEnabled && (
+                          <>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                                <input
+                                  type="text"
+                                  value={settings.bankName || ''}
+                                  onChange={(e) => updateField('bankName', e.target.value)}
+                                  placeholder="e.g., Chase Bank"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                <input
+                                  type="text"
+                                  value={settings.bankAccountNumber || ''}
+                                  onChange={(e) => updateField('bankAccountNumber', e.target.value)}
+                                  placeholder="e.g., 1234567890"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
+                              <input
+                                type="text"
+                                value={settings.bankAccountHolder || ''}
+                                onChange={(e) => updateField('bankAccountHolder', e.target.value)}
+                                placeholder="e.g., Restaurant LLC"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Transfer Instructions</label>
+                              <textarea
+                                value={settings.bankTransferInstructions || ''}
+                                onChange={(e) => updateField('bankTransferInstructions', e.target.value)}
+                                placeholder="Please use your order number as the transfer reference..."
+                                rows={3}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="pt-4">
                       <button
                         onClick={() => saveSettings({
@@ -538,6 +615,11 @@ export const SettingsPage: React.FC = () => {
                           serviceFeeAmount: settings.serviceFeeAmount,
                           minimumOrderAmount: settings.minimumOrderAmount,
                           tipSuggestions: settings.tipSuggestions,
+                          bankTransferEnabled: settings.bankTransferEnabled,
+                          bankName: settings.bankName,
+                          bankAccountNumber: settings.bankAccountNumber,
+                          bankAccountHolder: settings.bankAccountHolder,
+                          bankTransferInstructions: settings.bankTransferInstructions,
                         })}
                         disabled={saving}
                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"

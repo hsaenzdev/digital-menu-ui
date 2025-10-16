@@ -99,6 +99,9 @@ export interface CustomerLocation {
 }
 
 // Order types (customer-facing)
+export type PaymentMethod = 'cash' | 'bank_transfer'
+export type PaymentStatus = 'pending' | 'confirmed' | 'failed'
+
 export interface Order {
   id: string
   orderNumber: number
@@ -106,14 +109,27 @@ export interface Order {
   customer?: Customer // Customer data (optional for backwards compatibility)
   customerLocationId: string
   customerLocation?: CustomerLocation // Location data
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
+  status: 'pending_payment' | 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
   subtotal: number
   tax: number
   tip: number
   total: number
   items: CartItem[]
+  paymentMethod: PaymentMethod
+  paymentStatus: PaymentStatus
+  transferReference?: string
+  transferConfirmedAt?: Date
+  transferConfirmedBy?: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface BankTransferSettings {
+  enabled: boolean
+  bankName: string
+  accountNumber: string
+  accountHolder: string
+  instructions: string
 }
 
 // API Response types
