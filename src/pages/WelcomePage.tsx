@@ -460,7 +460,7 @@ export const WelcomePage: React.FC = () => {
               {activeOrder && (
                 <button 
                   className="w-full bg-green-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-green-600 transform active:scale-95 transition-all"
-                  onClick={() => navigate(`/customer/${customerId}/order-status/${activeOrder.id}`)}
+                  onClick={() => navigate(`/${customerId}/order-status/${activeOrder.id}`)}
                 >
                   📦 Track My Order #{activeOrder.orderNumber}
                 </button>
@@ -469,7 +469,7 @@ export const WelcomePage: React.FC = () => {
               {/* Order History Button */}
               <button 
                 className="w-full bg-white/20 backdrop-blur text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-white/30 border-2 border-white/40 transform active:scale-95 transition-all"
-                onClick={() => navigate(`/customer/${customerId}/orders`)}
+                onClick={() => navigate(`/${customerId}/orders`)}
               >
                 📜 View Order History
               </button>
