@@ -22,6 +22,19 @@ import { DeliveryZonesManager } from './pages/manager/DeliveryZonesManager'
 import { AnalyticsPage } from './pages/manager/AnalyticsPage'
 import { SettingsPage } from './pages/manager/SettingsPage'
 
+// Validation Error Pages
+import {
+  CustomerNotFoundPage,
+  CustomerDisabledPage,
+  RestaurantClosedPage,
+  RestaurantClosedWithOrdersPage,
+  OutsideCityPage,
+  OutsideZonePage,
+  NoLocationPermissionPage,
+  NoGeolocationSupportPage,
+  GenericErrorPage
+} from './pages/validation-errors'
+
 function App() {
   return (
     <Router>
@@ -40,7 +53,29 @@ function App() {
                 <Route path="/manager/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
                 <Route path="/manager/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
+                {/* Validation Error Routes - Customer-agnostic errors (no customerId needed) */}
+                <Route path="/error/customer-not-found" element={<CustomerNotFoundPage />} />
+
                 {/* Customer Routes - All include customerId */}
+                <Route path="/:customerId" element={<CustomerGuard><WelcomePage /></CustomerGuard>} />
+                <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
+                <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
+                <Route path="/:customerId/order-confirmation" element={<CustomerGuard><OrderConfirmationPage /></CustomerGuard>} />
+                <Route path="/:customerId/payment-pending/:orderId" element={<CustomerGuard><PaymentPendingPage /></CustomerGuard>} />
+                <Route path="/:customerId/order-status/:orderId" element={<CustomerGuard><OrderStatusPage /></CustomerGuard>} />
+                <Route path="/:customerId/orders" element={<CustomerGuard><OrderHistoryPage /></CustomerGuard>} />
+                
+                {/* Customer-Specific Validation Error Routes (customerId required) */}
+                <Route path="/:customerId/error/customer-disabled" element={<CustomerDisabledPage />} />
+                <Route path="/:customerId/error/restaurant-closed" element={<RestaurantClosedPage />} />
+                <Route path="/:customerId/error/restaurant-closed-with-orders" element={<RestaurantClosedWithOrdersPage />} />
+                <Route path="/:customerId/error/outside-city" element={<OutsideCityPage />} />
+                <Route path="/:customerId/error/outside-zone" element={<OutsideZonePage />} />
+                <Route path="/:customerId/error/no-location-permission" element={<NoLocationPermissionPage />} />
+                <Route path="/:customerId/error/no-geolocation-support" element={<NoGeolocationSupportPage />} />
+                <Route path="/:customerId/error/generic" element={<GenericErrorPage />} />
+
+                {/* Catch-all for invalid routes - show error */}
                 <Route path="/:customerId" element={<CustomerGuard><WelcomePage /></CustomerGuard>} />
                 <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
                 <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
