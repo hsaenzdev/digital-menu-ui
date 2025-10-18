@@ -1,49 +1,72 @@
 import React from 'react'
-import { ErrorPageLayout } from '../../components/validation-errors/ErrorPageLayout'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 
 /**
  * Error page shown when customer location is outside city boundaries
  * 
  * Triggered by: validateGeofencingValidate failed (outside city)
  * State: 'outside_city'
+ * 
+ * Matches WelcomePage styling for consistency
  */
 export const OutsideCityPage: React.FC = () => {
-  const { handleTryAgain, geofencingData } = useErrorPageHelpers()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { customerId } = useParams<{ customerId: string }>()
 
-  const cityName = geofencingData?.city?.name || 'our service area'
+  // Get geofencing data from location state (if passed by useValidationRedirect)
+  const state = location.state as any
+  const geofencingData = state?.geofencing
+
+  const handleTryAgain = () => {
+    if (customerId) {
+      navigate(`/${customerId}`)
+    }
+  }
+
+  const cityName = geofencingData?.city?.name
+  const message = geofencingData?.message || "We don't currently operate in your city."
 
   return (
-    <ErrorPageLayout
-      icon="📍"
-      title="Outside Service Area"
-      message={`We currently only serve customers in ${cityName}. We're working on expanding to new areas!`}
-      primaryAction={{
-        label: '🔄 Try Again',
-        onClick: handleTryAgain,
-        variant: 'fire'
-      }}
-      showSupport={true}
-      supportMessage="Want us to deliver to your area? Let us know:"
-    >
-      {/* Location Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-        <p className="text-sm font-semibold text-blue-800">
-          📌 Current Service Area
-        </p>
-        <p className="text-lg font-bold text-blue-900 mt-1">
-          {cityName}
-        </p>
-      </div>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 overflow-hidden p-6">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center max-w-md w-full">
+          <div className="text-8xl mb-6">🌍</div>
+          <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+            We're Not in Your City Yet
+          </h2>
+          
+          <p className="text-white/90 text-lg mb-6 drop-shadow">
+            {message}
+          </p>
+          
+          {/* City Detection Card */}
+          {cityName && (
+            <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+              <p className="text-white/80 text-sm">
+                <span className="font-semibold">Your Location:</span> {cityName}
+              </p>
+              <p className="text-white/70 text-xs mt-1">
+                We're working hard to expand to your area!
+              </p>
+            </div>
+          )}
 
-      {/* Expansion Note */}
-      <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-        <p className="font-semibold mb-1">🚀 We're Growing!</p>
-        <p>
-          We're constantly expanding our delivery areas. 
-          Contact us to request service in your neighborhood.
-        </p>
+          <div className="space-y-3">
+            <button 
+              className="w-full bg-white text-orange-600 font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-orange-50 transform active:scale-95 transition-all"
+              onClick={handleTryAgain}
+            >
+              🔄 Try Again
+            </button>
+            
+            <div className="text-white/80 text-sm mt-4">
+              <p className="mb-2">📧 Want us in your city?</p>
+              <p className="text-white/60 text-xs">Email: expansion@restaurant.com</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </ErrorPageLayout>
+    </div>
   )
 }

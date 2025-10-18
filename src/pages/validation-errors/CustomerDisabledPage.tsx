@@ -1,28 +1,52 @@
 import React from 'react'
-import { ErrorPageLayout } from '../../components/validation-errors/ErrorPageLayout'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useNavigate, useParams } from 'react-router-dom'
 
 /**
  * Error page shown when customer account is disabled/suspended
  * 
  * Triggered by: validateCustomerStatus failed (canOrder = false)
  * State: 'customer_disabled'
+ * 
+ * Matches WelcomePage styling for consistency
  */
 export const CustomerDisabledPage: React.FC = () => {
-  const { handleTryAgain } = useErrorPageHelpers()
+  const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
+
+  const handleTryAgain = () => {
+    if (customerId) {
+      navigate(`/${customerId}`)
+    }
+  }
 
   return (
-    <ErrorPageLayout
-      icon="🚫"
-      title="Account Suspended"
-      message="Your account has been temporarily suspended. Please contact support to resolve this issue."
-      primaryAction={{
-        label: '🔄 Try Again',
-        onClick: handleTryAgain,
-        variant: 'fire'
-      }}
-      showSupport={true}
-      supportMessage="To reactivate your account, please contact:"
-    />
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 overflow-hidden p-6">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center max-w-md w-full">
+          <div className="text-8xl mb-6">🚫</div>
+          <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+            Account Suspended
+          </h2>
+          
+          <p className="text-white/90 text-lg mb-6 drop-shadow">
+            Your account has been temporarily suspended. Please contact our support team for assistance.
+          </p>
+          
+          {/* Support Info Card */}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
+            <p className="text-white/80 text-sm font-semibold mb-2">Need Help?</p>
+            <p className="text-white/70 text-xs mb-1">📞 Call: (555) 123-4567</p>
+            <p className="text-white/70 text-xs">📧 Email: support@restaurant.com</p>
+          </div>
+
+          <button 
+            className="w-full bg-white/20 text-white border border-white/30 font-bold text-lg py-4 px-6 rounded-xl hover:bg-white/30 transform active:scale-95 transition-all"
+            onClick={handleTryAgain}
+          >
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

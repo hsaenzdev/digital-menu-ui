@@ -1,46 +1,45 @@
 import React from 'react'
-import { ErrorPageLayout } from '../../components/validation-errors/ErrorPageLayout'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useNavigate, useParams } from 'react-router-dom'
 
 /**
  * Generic error page for unexpected validation failures
  * 
  * Triggered by: Any validation that returns 'error' state
  * State: 'error'
+ * 
+ * Matches WelcomePage styling for consistency
  */
 export const GenericErrorPage: React.FC = () => {
-  const { handleTryAgain, validationState } = useErrorPageHelpers()
+  const navigate = useNavigate()
+  const { customerId } = useParams<{ customerId: string }>()
+
+  const handleTryAgain = () => {
+    if (customerId) {
+      navigate(`/${customerId}`)
+    }
+  }
 
   return (
-    <ErrorPageLayout
-      icon="⚠️"
-      title="Something Went Wrong"
-      message="We encountered an unexpected error while verifying your access. Please try again."
-      primaryAction={{
-        label: '🔄 Try Again',
-        onClick: handleTryAgain,
-        variant: 'fire'
-      }}
-      showSupport={true}
-      supportMessage="If this problem persists, please contact:"
-    >
-      {/* Error Details (for debugging) */}
-      {validationState && validationState !== 'error' && (
-        <div className="text-xs text-gray-400 bg-gray-50 rounded p-2 mb-4 font-mono">
-          Error Code: {validationState}
-        </div>
-      )}
+    <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center max-w-md w-full">
+          <div className="text-8xl mb-6">⚠️</div>
+          <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
+            Something Went Wrong
+          </h2>
+          
+          <p className="text-white/90 text-lg mb-6 drop-shadow">
+            We couldn't verify your delivery zone. Please try again.
+          </p>
 
-      {/* Suggestions */}
-      <div className="text-sm text-gray-600 bg-blue-50 rounded-lg p-3">
-        <p className="font-semibold mb-2">💡 Try these steps:</p>
-        <ul className="space-y-1 text-left">
-          <li>• Check your internet connection</li>
-          <li>• Refresh the page</li>
-          <li>• Clear browser cache and cookies</li>
-          <li>• Try a different browser</li>
-        </ul>
+          <button 
+            className="w-full bg-white text-fire-600 font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-fire-50 transform active:scale-95 transition-all"
+            onClick={handleTryAgain}
+          >
+            🔄 Try Again
+          </button>
+        </div>
       </div>
-    </ErrorPageLayout>
+    </div>
   )
 }
