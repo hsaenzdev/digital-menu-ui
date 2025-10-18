@@ -1,5 +1,6 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { SUPPORT_PHONE, SUPPORT_EMAIL } from './constants'
 
 /**
  * Error page shown when customer account is disabled/suspended
@@ -10,14 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom'
  * Matches WelcomePage styling for consistency
  */
 export const CustomerDisabledPage: React.FC = () => {
-  const navigate = useNavigate()
-  const { customerId } = useParams<{ customerId: string }>()
-
-  const handleTryAgain = () => {
-    if (customerId) {
-      navigate(`/${customerId}`)
-    }
-  }
+  const { handleTryAgain } = useErrorPageHelpers()
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 overflow-hidden p-6">
@@ -35,8 +29,8 @@ export const CustomerDisabledPage: React.FC = () => {
           {/* Support Info Card */}
           <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
             <p className="text-white/80 text-sm font-semibold mb-2">Need Help?</p>
-            <p className="text-white/70 text-xs mb-1">📞 Call: (555) 123-4567</p>
-            <p className="text-white/70 text-xs">📧 Email: support@restaurant.com</p>
+            <p className="text-white/70 text-xs mb-1">📞 Call: {SUPPORT_PHONE}</p>
+            <p className="text-white/70 text-xs">📧 Email: {SUPPORT_EMAIL}</p>
           </div>
 
           <button 

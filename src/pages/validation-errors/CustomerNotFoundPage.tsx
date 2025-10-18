@@ -1,4 +1,5 @@
 import React from 'react'
+import { SUPPORT_PHONE, SUPPORT_EMAIL } from './constants'
 
 /**
  * Error page shown when customer ID is not found in database
@@ -12,7 +13,7 @@ import React from 'react'
 export const CustomerNotFoundPage: React.FC = () => {
   const handleContactSupport = () => {
     // Could open support link, WhatsApp, etc.
-    window.location.href = 'tel:5551234567'
+    window.location.href = `tel:${SUPPORT_PHONE.replace(/[^0-9]/g, '')}`
   }
 
   return (
@@ -49,8 +50,8 @@ export const CustomerNotFoundPage: React.FC = () => {
           
           <div className="text-white/80 text-sm mt-4">
             <p className="mb-2">Need help?</p>
-            <p className="text-white/60 text-xs">📞 (555) 123-4567</p>
-            <p className="text-white/60 text-xs">📧 support@restaurant.com</p>
+            <p className="text-white/60 text-xs">📞 {SUPPORT_PHONE}</p>
+            <p className="text-white/60 text-xs">📧 {SUPPORT_EMAIL}</p>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { SUPPORT_PHONE } from './constants'
 
 /**
  * Error page shown when browser doesn't support geolocation
@@ -12,14 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom'
  * Matches WelcomePage styling for consistency
  */
 export const NoGeolocationSupportPage: React.FC = () => {
-  const navigate = useNavigate()
-  const { customerId } = useParams<{ customerId: string }>()
-
-  const handleTryAgain = () => {
-    if (customerId) {
-      navigate(`/${customerId}`)
-    }
-  }
+  const { handleTryAgain } = useErrorPageHelpers()
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">
@@ -55,7 +49,7 @@ export const NoGeolocationSupportPage: React.FC = () => {
           
           <div className="text-white/80 text-sm mt-4">
             <p className="mb-2">📞 Need help?</p>
-            <p className="text-white/60 text-xs">Call: (555) 123-4567</p>
+            <p className="text-white/60 text-xs">Call: {SUPPORT_PHONE}</p>
           </div>
         </div>
       </div>

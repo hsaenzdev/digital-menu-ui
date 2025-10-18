@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
 
 /**
  * Error page shown when user denies location permission
@@ -10,14 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom'
  * Matches WelcomePage styling for consistency
  */
 export const NoLocationPermissionPage: React.FC = () => {
-  const navigate = useNavigate()
-  const { customerId } = useParams<{ customerId: string }>()
-
-  const handleTryAgain = () => {
-    if (customerId) {
-      navigate(`/${customerId}`)
-    }
-  }
+  const { handleTryAgain } = useErrorPageHelpers()
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">

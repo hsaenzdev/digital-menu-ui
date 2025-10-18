@@ -1,5 +1,6 @@
 import React from 'react'
-import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { EXPANSION_EMAIL } from './constants'
 
 /**
  * Error page shown when customer location is outside city boundaries
@@ -10,19 +11,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
  * Matches WelcomePage styling for consistency
  */
 export const OutsideCityPage: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { customerId } = useParams<{ customerId: string }>()
-
-  // Get geofencing data from location state (if passed by useValidationRedirect)
-  const state = location.state as any
-  const geofencingData = state?.geofencing
-
-  const handleTryAgain = () => {
-    if (customerId) {
-      navigate(`/${customerId}`)
-    }
-  }
+  const { handleTryAgain, geofencingData } = useErrorPageHelpers()
 
   const cityName = geofencingData?.city?.name
   const message = geofencingData?.message || "We don't currently operate in your city."
@@ -62,7 +51,7 @@ export const OutsideCityPage: React.FC = () => {
             
             <div className="text-white/80 text-sm mt-4">
               <p className="mb-2">📧 Want us in your city?</p>
-              <p className="text-white/60 text-xs">Email: expansion@restaurant.com</p>
+              <p className="text-white/60 text-xs">Email: {EXPANSION_EMAIL}</p>
             </div>
           </div>
         </div>

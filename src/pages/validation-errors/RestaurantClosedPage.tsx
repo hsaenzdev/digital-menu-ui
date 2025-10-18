@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useRestaurantStatus } from './useRestaurantStatus'
+import { SUPPORT_PHONE } from './constants'
 
 /**
  * Error page shown when restaurant is closed (no active orders)
@@ -11,30 +13,8 @@ import { useErrorPageHelpers } from '../../components/validation-errors/useValid
  */
 export const RestaurantClosedPage: React.FC = () => {
   const { handleTryAgain, handleViewHistory } = useErrorPageHelpers()
-  
-  // Fetch restaurant status directly (matches WelcomePage ln 131-139)
-  const [restaurantStatus, setRestaurantStatus] = useState<{
-    isOpen: boolean
-    message: string
-    nextOpening?: { day: string; time: string; hoursUntil: number; minutesUntil: number } | null
-  } | null>(null)
+  const restaurantStatus = useRestaurantStatus()
 
-  useEffect(() => {
-    const fetchRestaurantStatus = async () => {
-      try {
-        const response = await fetch('/api/business/status')
-        const data = await response.json()
-        if (data.success && data.data) {
-          setRestaurantStatus(data.data)
-        }
-      } catch (error) {
-        console.error('Failed to fetch restaurant status:', error)
-      }
-    }
-    fetchRestaurantStatus()
-  }, [])
-
-  // Extract directly from restaurantStatus (matches WelcomePage ln 412)
   const message = restaurantStatus?.message
   const nextOpening = restaurantStatus?.nextOpening
 
@@ -86,7 +66,7 @@ export const RestaurantClosedPage: React.FC = () => {
             
             <div className="text-white/80 text-sm mt-4">
               <p className="mb-2">📞 Questions?</p>
-              <p className="text-white/60 text-xs">Call us: (555) 123-4567</p>
+              <p className="text-white/60 text-xs">Call us: {SUPPORT_PHONE}</p>
             </div>
           </div>
         </div>

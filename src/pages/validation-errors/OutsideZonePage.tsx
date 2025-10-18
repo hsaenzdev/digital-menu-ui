@@ -1,5 +1,6 @@
 import React from 'react'
-import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { SUPPORT_PHONE } from './constants'
 
 /**
  * Error page shown when customer location is outside delivery zone
@@ -10,19 +11,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
  * Matches WelcomePage styling for consistency
  */
 export const OutsideZonePage: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { customerId } = useParams<{ customerId: string }>()
-
-  // Get geofencing data from location state (if passed by useValidationRedirect)
-  const state = location.state as any
-  const geofencingData = state?.geofencing
-
-  const handleTryAgain = () => {
-    if (customerId) {
-      navigate(`/${customerId}`)
-    }
-  }
+  const { handleTryAgain, geofencingData } = useErrorPageHelpers()
 
   const cityName = geofencingData?.city?.name
   const message = geofencingData?.message || "Unfortunately, your location is outside our current delivery zones."
@@ -62,7 +51,7 @@ export const OutsideZonePage: React.FC = () => {
             
             <div className="text-white/80 text-sm mt-4">
               <p className="mb-2">📞 Want to know when we're in your area?</p>
-              <p className="text-white/60 text-xs">Contact us: (555) 123-4567</p>
+              <p className="text-white/60 text-xs">Contact us: {SUPPORT_PHONE}</p>
             </div>
           </div>
         </div>
