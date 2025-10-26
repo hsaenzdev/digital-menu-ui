@@ -27,7 +27,6 @@ import {
   CustomerNotFoundPage,
   CustomerDisabledPage,
   RestaurantClosedPage,
-  RestaurantClosedWithOrdersPage,
   OutsideCityPage,
   OutsideZonePage,
   NoLocationPermissionPage,
@@ -68,7 +67,6 @@ function App() {
                 {/* Customer-Specific Validation Error Routes (customerId required) */}
                 <Route path="/:customerId/error/customer-disabled" element={<CustomerDisabledPage />} />
                 <Route path="/:customerId/error/restaurant-closed" element={<RestaurantClosedPage />} />
-                <Route path="/:customerId/error/restaurant-closed-with-orders" element={<RestaurantClosedWithOrdersPage />} />
                 <Route path="/:customerId/error/outside-city" element={<OutsideCityPage />} />
                 <Route path="/:customerId/error/outside-zone" element={<OutsideZonePage />} />
                 <Route path="/:customerId/error/no-location-permission" element={<NoLocationPermissionPage />} />

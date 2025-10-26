@@ -5,15 +5,24 @@ import { getStatusEmoji, formatTimeUntilOpening, getStatusTitle } from './restau
 import { SUPPORT_PHONE } from '../constants'
 
 /**
- * Error page shown when restaurant is closed (no active orders)
+ * Error page shown when restaurant is closed
  * 
  * Triggered by: validateRestaurantStatus failed (isOpen = false)
  * State: 'restaurant_closed'
  * 
+ * Handles both cases:
+ * - Customer with no active orders: Shows next opening time
+ * - Customer with active orders: Shows order tracking option
+ * 
  * Matches WelcomePage styling for consistency
  */
 export const RestaurantClosedPage: React.FC = () => {
-  const { handleTryAgain, handleViewHistory } = useErrorPageHelpers()
+  const { 
+    handleTryAgain, 
+    handleViewHistory, 
+    handleTrackOrder, 
+    activeOrder 
+  } = useErrorPageHelpers()
   const restaurantStatus = useRestaurantStatus()
 
   // Use API data with fallbacks
@@ -33,8 +42,24 @@ export const RestaurantClosedPage: React.FC = () => {
             {title}
           </h2>
           
+          {/* Active Order Notice - Shown if customer has pending orders */}
+          {activeOrder && (
+            <div className="bg-green-500/20 backdrop-blur border-2 border-green-300/50 rounded-xl p-4 mb-4">
+              <div className="text-5xl mb-2">✅</div>
+              <p className="text-white font-bold text-lg mb-2">
+                Don't Worry!
+              </p>
+              <p className="text-white/90 text-sm">
+                We're closed for new orders, but we're still preparing and will deliver your active order #{activeOrder.orderNumber || activeOrder.id?.slice(-6) || 'N/A'}!
+              </p>
+            </div>
+          )}
+          
           <p className="text-white/90 text-lg mb-6 drop-shadow">
-            {message}
+            {activeOrder 
+              ? "You can't place new orders right now, but you can check your order status below."
+              : message
+            }
           </p>
           
           {/* Next Opening Card */}
@@ -53,6 +78,16 @@ export const RestaurantClosedPage: React.FC = () => {
           )}
 
           <div className="space-y-3">
+            {/* Track Order Button - Primary (only shown if active order exists) */}
+            {activeOrder && (
+              <button 
+                className="w-full bg-green-500 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-green-600 transform active:scale-95 transition-all"
+                onClick={handleTrackOrder}
+              >
+                📦 Track My Order #{activeOrder.orderNumber || activeOrder.id?.slice(-6) || ''}
+              </button>
+            )}
+            
             {/* Order History Button */}
             <button 
               className="w-full bg-white/20 backdrop-blur text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-white/30 border-2 border-white/40 transform active:scale-95 transition-all"

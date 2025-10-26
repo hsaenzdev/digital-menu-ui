@@ -49,13 +49,11 @@ export interface UseValidationRedirectReturn extends UseValidationsReturn {
  * 
  * @param state - Validation state from useValidations
  * @param customerId - Customer ID for building route path
- * @param hasActiveOrder - Whether customer has an active order
  * @returns Error route path
  */
 function mapStateToRoute(
   state: ValidationState,
-  customerId: string,
-  hasActiveOrder: boolean
+  customerId: string
 ): string {
   switch (state) {
     case 'customer_not_found':
@@ -66,14 +64,10 @@ function mapStateToRoute(
       return `/${customerId}/error/customer-disabled`
     
     case 'restaurant_closed':
-      // Special case: if customer has active orders, show different page
-      return hasActiveOrder
-        ? `/${customerId}/error/restaurant-closed-with-orders`
-        : `/${customerId}/error/restaurant-closed`
-    
     case 'restaurant_closed_active_orders':
-      // Backend specifically said restaurant closed but has active orders
-      return `/${customerId}/error/restaurant-closed-with-orders`
+      // All restaurant closed cases go to same page
+      // The page will check for activeOrder and show appropriate UI
+      return `/${customerId}/error/restaurant-closed`
     
     case 'no_geolocation_support':
       return `/${customerId}/error/no-geolocation-support`
@@ -158,8 +152,7 @@ export function useValidationRedirect(
     }
     
     // Determine error route
-    const hasActiveOrder = Boolean(config.activeOrder)
-    const errorRoute = mapStateToRoute(currentState, config.customerId, hasActiveOrder)
+    const errorRoute = mapStateToRoute(currentState, config.customerId)
     
     // Prepare state to pass to error page
     const navigationState = {

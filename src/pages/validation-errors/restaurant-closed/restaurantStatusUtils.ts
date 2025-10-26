@@ -27,20 +27,36 @@ export function formatTimeUntilOpening(nextOpening: RestaurantStatus['nextOpenin
 
   const { hoursUntil, minutesUntil } = nextOpening
 
-  // Handle same-day opening (less than 24 hours)
+  // Less than 1 minute (shouldn't happen, but handle it)
+  if (hoursUntil === 0 && minutesUntil === 0) {
+    return 'Opening very soon'
+  }
+
+  // Less than 1 hour - show minutes only
   if (hoursUntil === 0 && minutesUntil > 0) {
     return `In ${minutesUntil} minute${minutesUntil !== 1 ? 's' : ''}`
   }
 
-  if (hoursUntil > 0 && minutesUntil > 0) {
-    return `In ${hoursUntil}h ${minutesUntil}m`
-  }
-
-  if (hoursUntil > 0) {
+  // Exactly on the hour
+  if (hoursUntil > 0 && minutesUntil === 0) {
     return `In ${hoursUntil} hour${hoursUntil !== 1 ? 's' : ''}`
   }
 
-  // Opening very soon or next day
+  // Hours and minutes
+  if (hoursUntil > 0 && minutesUntil > 0) {
+    // For less than 24 hours, show detailed time
+    if (hoursUntil < 24) {
+      return `In ${hoursUntil}h ${minutesUntil}m`
+    }
+    // For 24+ hours, show hours only (simpler)
+    return `In ${hoursUntil} hour${hoursUntil !== 1 ? 's' : ''}`
+  }
+
+  // Negative time (shouldn't happen, but handle gracefully)
+  if (hoursUntil < 0 || minutesUntil < 0) {
+    return null
+  }
+
   return null
 }
 

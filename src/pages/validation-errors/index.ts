@@ -13,7 +13,7 @@
  */
 
 // Restaurant Status Errors
-export { RestaurantClosedPage, RestaurantClosedWithOrdersPage } from './restaurant-closed'
+export { RestaurantClosedPage } from './restaurant-closed'
 
 // Customer Account Errors
 export { CustomerNotFoundPage, CustomerDisabledPage } from './customer-account'
