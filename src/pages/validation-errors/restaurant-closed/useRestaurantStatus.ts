@@ -1,24 +1,38 @@
 import { useState, useEffect } from 'react'
 
 /**
- * Restaurant status data structure
+ * Restaurant status data structure (matches backend API)
  */
-interface RestaurantStatus {
+export interface RestaurantStatus {
   isOpen: boolean
+  currentStatus: 'open' | 'closed' | 'opening_soon' | 'closing_soon'
   message: string
-  nextOpening?: {
+  todayHours: {
+    open: string
+    close: string
+    closed: boolean
+  } | null
+  nextOpening: {
     day: string
+    date: string
     time: string
     hoursUntil: number
     minutesUntil: number
   } | null
+  specialHoursToday: {
+    date: string
+    open?: string
+    close?: string
+    closed: boolean
+    reason?: string
+  } | null
 }
 
 /**
- * Custom hook to fetch restaurant status
+ * Custom hook to fetch restaurant status from API
  * Shared between RestaurantClosedPage and RestaurantClosedWithOrdersPage
  * 
- * @returns Restaurant status data or null if not loaded yet
+ * @returns Complete restaurant status data or null if not loaded yet
  */
 export function useRestaurantStatus(): RestaurantStatus | null {
   const [restaurantStatus, setRestaurantStatus] = useState<RestaurantStatus | null>(null)

@@ -1,6 +1,6 @@
 import React from 'react'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
-import { SUPPORT_PHONE, SUPPORT_EMAIL } from './constants'
+import { useErrorPageHelpers } from '../../../components/validation-errors/useValidationRedirect'
+import { SUPPORT_PHONE, SUPPORT_EMAIL } from '../constants'
 
 /**
  * Error page shown when customer account is disabled/suspended

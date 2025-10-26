@@ -1,7 +1,8 @@
 import React from 'react'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useErrorPageHelpers } from '../../../components/validation-errors/useValidationRedirect'
 import { useRestaurantStatus } from './useRestaurantStatus'
-import { SUPPORT_PHONE } from './constants'
+import { getStatusEmoji, formatTimeUntilOpening, getStatusTitle } from './restaurantStatusUtils'
+import { SUPPORT_PHONE } from '../constants'
 
 /**
  * Error page shown when restaurant is closed BUT customer has active orders
@@ -21,15 +22,21 @@ export const RestaurantClosedWithOrdersPage: React.FC = () => {
   } = useErrorPageHelpers()
   
   const restaurantStatus = useRestaurantStatus()
-  const nextOpening = restaurantStatus?.nextOpening
+
+  // Use API data with fallbacks
+  const currentStatus = restaurantStatus?.currentStatus || 'closed'
+  const emoji = getStatusEmoji(currentStatus)
+  const title = getStatusTitle(currentStatus)
+  const nextOpening = restaurantStatus?.nextOpening || null
+  const timeUntilOpening = formatTimeUntilOpening(nextOpening)
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-600 overflow-hidden p-6">
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md w-full">
-          <div className="text-8xl mb-6">🕐</div>
+          <div className="text-8xl mb-6">{emoji}</div>
           <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-4">
-            We're Currently Closed
+            {title}
           </h2>
           
           {/* Active Order Notice */}
@@ -49,19 +56,18 @@ export const RestaurantClosedWithOrdersPage: React.FC = () => {
             You can't place new orders right now, but you can check your order status below.
           </p>
           
-          {/* Next Opening Card - Matches WelcomePage ln 441-453 exactly */}
+          {/* Next Opening Card */}
           {nextOpening && (
             <div className="bg-white/10 backdrop-blur rounded-xl p-4 mb-6">
               <p className="text-white/80 text-sm font-semibold mb-2">Next Opening:</p>
               <p className="text-white text-xl font-bold mb-1">
                 {nextOpening.day} at {nextOpening.time}
               </p>
-              <p className="text-white/70 text-xs">
-                {nextOpening.hoursUntil > 0 
-                  ? `In ${nextOpening.hoursUntil}h ${nextOpening.minutesUntil}m`
-                  : `In ${nextOpening.minutesUntil} minutes`
-                }
-              </p>
+              {timeUntilOpening && (
+                <p className="text-white/70 text-xs">
+                  {timeUntilOpening}
+                </p>
+              )}
             </div>
           )}
 

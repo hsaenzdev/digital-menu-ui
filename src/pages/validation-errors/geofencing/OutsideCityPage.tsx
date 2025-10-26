@@ -1,6 +1,6 @@
 import React from 'react'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
-import { EXPANSION_EMAIL } from './constants'
+import { useErrorPageHelpers } from '../../../components/validation-errors/useValidationRedirect'
+import { EXPANSION_EMAIL } from '../constants'
 
 /**
  * Error page shown when customer location is outside city boundaries

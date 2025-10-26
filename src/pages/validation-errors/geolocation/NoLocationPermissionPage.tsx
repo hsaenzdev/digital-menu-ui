@@ -1,5 +1,5 @@
 import React from 'react'
-import { useErrorPageHelpers } from '../../components/validation-errors/useValidationRedirect'
+import { useErrorPageHelpers } from '../../../components/validation-errors/useValidationRedirect'
 
 /**
  * Error page shown when user denies location permission

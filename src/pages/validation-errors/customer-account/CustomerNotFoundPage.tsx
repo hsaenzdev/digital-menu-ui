@@ -1,5 +1,5 @@
 import React from 'react'
-import { SUPPORT_PHONE, SUPPORT_EMAIL } from './constants'
+import { SUPPORT_PHONE, SUPPORT_EMAIL } from '../constants'
 
 /**
  * Error page shown when customer ID is not found in database
