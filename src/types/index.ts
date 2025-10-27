@@ -52,8 +52,16 @@ export interface MenuItem {
   imageUrl?: string
   allergens?: string | string[] // API returns string, we'll parse to array
   isAvailable: boolean
+  isActive?: boolean
   displayOrder: number
   modifierGroups?: ModifierGroup[]
+  // Dietary & Preparation Info
+  isVegetarian?: boolean
+  isVegan?: boolean
+  isGlutenFree?: boolean
+  calories?: number
+  preparationTime?: number // In minutes (aka prepTime)
+  spicyLevel?: number // 0-5 scale
   createdAt: Date
   updatedAt: Date
 }

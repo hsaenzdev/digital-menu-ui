@@ -1,2 +1,2 @@
 export { useValidationRedirect, useErrorPageHelpers } from './useValidationRedirect'
-export type { ValidationRedirectConfig, UseValidationRedirectReturn } from './useValidationRedirect'
+export type { UseValidationRedirectConfig, UseValidationRedirectReturn } from './useValidationRedirect'
