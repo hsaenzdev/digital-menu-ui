@@ -9,6 +9,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    allowedHosts: [
+      "9c0994c60f24.ngrok-free.app"
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

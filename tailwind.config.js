@@ -14,6 +14,12 @@ export default {
       '2xl': '1536px',
     },
     extend: {
+      height: {
+        'screen-dvh': '100dvh', // Dynamic viewport height for mobile
+      },
+      minHeight: {
+        'screen-dvh': '100dvh',
+      },
       colors: {
         // Fire/Orange theme colors
         fire: {
