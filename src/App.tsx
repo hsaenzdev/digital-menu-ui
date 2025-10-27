@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { WelcomePage } from "./pages/welcome";
-import { MenuPage } from "./pages/MenuPage";
-import { CartPage } from "./pages/CartPage";
-import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
-import { PaymentPendingPage } from "./pages/PaymentPendingPage";
-import { OrderStatusPage } from "./pages/OrderStatusPage";
-import { OrderHistoryPage } from "./pages/OrderHistoryPage";
+import { MenuPage } from "./pages/menu";
+import { CartPage } from "./pages/cart";
+import { OrderConfirmationPage } from "./pages/order-confirmation";
+import { PaymentPendingPage } from "./pages/payment-pending";
+import { OrderStatusPage } from "./pages/order-status";
+import { OrderHistoryPage } from "./pages/order-history";
 import { CartProvider } from "./context/CartContext";
 import { CustomerProvider } from "./context/CustomerContext";
 import { AuthProvider } from "./context/AuthContext";

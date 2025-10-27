@@ -1,0 +1,1 @@
+export { PaymentPendingPage } from './PaymentPendingPage'
