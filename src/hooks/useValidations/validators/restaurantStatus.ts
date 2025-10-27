@@ -5,7 +5,7 @@
  * Special handling: If closed but customer has active orders, allow with warning
  */
 
-import type { ValidatorResult, RestaurantStatusData, ValidatorOptions } from '../types'
+import type { ValidatorResult, RestaurantStatusData, ValidatorOptions, ValidatorContext } from '../types'
 import { API_ENDPOINTS } from '../constants'
 import { 
   validationCache, 
@@ -17,12 +17,12 @@ import {
 /**
  * Validate restaurant is open
  * 
- * @param _params - Not used (restaurant status is global)
+ * @param _context - Not used (restaurant status is global)
  * @param options - Validator options
  * @returns Validation result with restaurant status data
  */
 export async function validateRestaurantStatus(
-  _params: any,
+  _context: ValidatorContext,
   options?: ValidatorOptions
 ): Promise<ValidatorResult<RestaurantStatusData>> {
   // Check cache first (unless skipCache is true)

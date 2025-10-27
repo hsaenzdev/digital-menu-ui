@@ -4,7 +4,7 @@
  * Validates that the customer exists in the database
  */
 
-import type { ValidatorResult, CustomerData, ValidatorOptions } from '../types'
+import type { ValidatorResult, CustomerData, ValidatorOptions, ValidatorContext } from '../types'
 import { API_ENDPOINTS } from '../constants'
 import { 
   validationCache, 
@@ -16,14 +16,16 @@ import {
 /**
  * Validate customer exists in database
  * 
- * @param customerId - Customer ID to validate
+ * @param context - Validator context (contains customerId)
  * @param options - Validator options
  * @returns Validation result with customer data
  */
 export async function validateCustomerExists(
-  customerId: string,
+  context: ValidatorContext,
   options?: ValidatorOptions
 ): Promise<ValidatorResult<CustomerData>> {
+  const customerId = context.customerId
+
   // Check cache first (unless skipCache is true)
   if (!options?.skipCache) {
     const cacheKey = getCacheKeyCustomerExists(customerId)

@@ -1,246 +1,228 @@
+/**
+ * useValidationRedirect Hook (v2)
+ * 
+ * Thin wrapper around useValidations that auto-redirects on validation failure.
+ * Handles navigation to appropriate error pages based on validation state.
+ */
+
 import { useEffect } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useValidations } from '../../hooks/useValidations'
 import type {
+  UseValidationsConfig,
+  UseValidationsReturnV2,
   ValidationState,
-  ValidationConfig,
-  UseValidationsReturn
 } from '../../hooks/useValidations/types'
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 /**
  * Configuration for useValidationRedirect hook
  */
-export interface ValidationRedirectConfig {
-  /** Customer ID to validate */
+export interface UseValidationRedirectConfig extends Omit<UseValidationsConfig, 'autoRun'> {
+  /** Customer ID for validation and routing */
   customerId: string
   
-  /** Which validations to run for this view */
-  requiredValidations: ValidationConfig
+  /** Auto-run validation on mount (default: true) */
+  autoRun?: boolean
   
-  /** Current path to return to on retry */
-  currentPath: string
+  /** Custom redirect handler (override default behavior) */
+  onRedirect?: (route: string, state: any) => void
   
-  /** Optional: Active order (for restaurant closed special case) */
-  activeOrder?: {
-    id: string
-    status: string
-  } | null
-  
-  /** Optional: Custom error handling (override default redirect) */
-  onValidationError?: (state: ValidationState, data: any) => void
+  /** Additional state to pass to error page */
+  customState?: Record<string, any>
 }
 
 /**
- * Return type for useValidationRedirect hook
+ * Return type (same as useValidations)
  */
-export interface UseValidationRedirectReturn extends UseValidationsReturn {
-  /** Whether validations are currently running */
-  isValidating: boolean
-  
-  /** Current validation state */
-  state: ValidationState
-  
-  /** Whether all validations passed */
-  isAllowed: boolean
-}
+export type UseValidationRedirectReturn = UseValidationsReturnV2
+
+// ============================================================================
+// HELPERS
+// ============================================================================
 
 /**
- * Maps validation states to error route paths
+ * Maps validation state to error route path
  * 
- * @param state - Validation state from useValidations
- * @param customerId - Customer ID for building route path
- * @returns Error route path
+ * @param validationState - The validation state from hook
+ * @param customerId - Customer ID for building route
+ * @returns Error route path or null if no error
  */
-function mapStateToRoute(
-  state: ValidationState,
+function getErrorRoute(
+  validationState: ValidationState | undefined,
   customerId: string
-): string {
-  switch (state) {
-    case 'customer_not_found':
-      // Customer doesn't exist - no customerId in route
-      return '/error/customer-not-found'
-    
-    case 'customer_disabled':
-      return `/${customerId}/error/customer-disabled`
-    
-    case 'restaurant_closed':
-    case 'restaurant_closed_active_orders':
-      // All restaurant closed cases go to same page
-      // The page will check for activeOrder and show appropriate UI
-      return `/${customerId}/error/restaurant-closed`
-    
-    case 'no_geolocation_support':
-      return `/${customerId}/error/no-geolocation-support`
-    
-    case 'no_location_permission':
-      return `/${customerId}/error/no-location-permission`
-    
-    case 'outside_city':
-      return `/${customerId}/error/outside-city`
-    
-    case 'outside_zone':
-      return `/${customerId}/error/outside-zone`
-    
-    case 'error':
-    default:
-      return `/${customerId}/error/generic`
+): string | null {
+  // No redirect needed for success or loading states
+  if (!validationState || validationState === 'allowed' || validationState === 'idle' || validationState === 'loading') {
+    return null
   }
+  
+  // Map validation states to routes
+  const routes: Record<ValidationState, string> = {
+    'idle': '',
+    'loading': '',
+    'allowed': '',
+    'customer_not_found': '/error/customer-not-found',
+    'customer_disabled': `/${customerId}/error/customer-disabled`,
+    'restaurant_closed': `/${customerId}/error/restaurant-closed`,
+    'restaurant_closed_active_orders': `/${customerId}/error/restaurant-closed`,
+    'no_geolocation_support': `/${customerId}/error/no-geolocation-support`,
+    'no_location_permission': `/${customerId}/error/no-location-permission`,
+    'outside_city': `/${customerId}/error/outside-city`,
+    'outside_zone': `/${customerId}/error/outside-zone`,
+    'error': `/${customerId}/error/generic`,
+  }
+  
+  return routes[validationState] || `/${customerId}/error/generic`
 }
 
+// ============================================================================
+// MAIN HOOK
+// ============================================================================
+
 /**
- * Hook that performs validations and automatically redirects on failure.
+ * useValidationRedirect Hook
  * 
- * This hook combines useValidations with automatic error handling via routing.
- * When a validation fails, it redirects to the appropriate error page.
+ * Performs validations and automatically redirects to error pages on failure.
+ * This is a thin wrapper around useValidations that adds redirect orchestration.
  * 
- * Usage:
- * ```tsx
- * const { isValidating } = useValidationRedirect({
+ * @param config - Validation and redirect configuration
+ * @returns Validation state and control functions
+ * 
+ * @example
+ * // Standard usage - auto-redirects on failure
+ * const { state, isValidating } = useValidationRedirect({
  *   customerId: customerId!,
- *   requiredValidations: {
- *     customerExists: true,
- *     customerStatus: true,
- *     restaurantStatus: true,
- *     geofencingValidate: true
- *   },
- *   currentPath: location.pathname
+ *   validations: [
+ *     { name: 'customerExists' },
+ *     { name: 'restaurantStatus' }
+ *   ]
  * })
  * 
- * if (isValidating) {
- *   return <LoadingSpinner />
- * }
- * 
- * // If we reach here, validation passed!
- * return <PageContent />
- * ```
- * 
- * @param config - Validation configuration
- * @returns Validation state and helpers
+ * if (isValidating) return <LoadingSpinner />
+ * if (state.phase === 'success') return <PageContent />
+ * return null // Redirect will happen automatically
  */
 export function useValidationRedirect(
-  config: ValidationRedirectConfig
+  config: UseValidationRedirectConfig
 ): UseValidationRedirectReturn {
   const navigate = useNavigate()
-  const location = useLocation()
   
-  // Run validations using our core validation hook
-  const validationResult = useValidations(
-    config.customerId,
-    config.requiredValidations
-  )
+  // Run core validation logic
+  const validation = useValidations(config.customerId, {
+    validations: config.validations,
+    autoRun: config.autoRun ?? true,  // Default to true for redirect hook
+    skipCache: config.skipCache,
+    apiTimeout: config.apiTimeout,
+  })
   
   // Watch for validation failures and auto-redirect
   useEffect(() => {
-    // Don't redirect while validating
-    if (validationResult.isValidating) {
+    // Only act when validation has failed
+    if (validation.state.phase !== 'failed') {
       return
     }
     
-    // Don't redirect if validation passed
-    if (validationResult.state === 'allowed') {
+    // Get the appropriate error route
+    const errorRoute = getErrorRoute(
+      validation.state.validationState,
+      config.customerId
+    )
+    
+    // No route means no redirect needed
+    if (!errorRoute) {
       return
     }
-    
-    // Validation failed - handle redirect
-    const currentState = validationResult.state
-    const validationData = validationResult.data
-    
-    // Allow custom error handling (override default redirect)
-    if (config.onValidationError) {
-      config.onValidationError(currentState, validationData)
-      return
-    }
-    
-    // Determine error route
-    const errorRoute = mapStateToRoute(currentState, config.customerId)
     
     // Prepare state to pass to error page
     const navigationState = {
-      // Where to return to on "Try Again"
-      returnTo: config.currentPath,
+      // Validation metadata
+      validationState: validation.state.validationState,
+      error: validation.state.error,
+      failedStep: validation.state.failedStep,
+      completedSteps: validation.state.completedSteps,
       
-      // Current validation state
-      validationState: currentState,
+      // All accumulated validation data
+      ...validation.data,
       
-      // All validation data (customer, restaurant, geofencing, etc.)
-      ...validationData,
-      
-      // Include active order if exists (for restaurant closed special case)
-      activeOrder: config.activeOrder || undefined
+      // Custom state from caller
+      ...config.customState,
     }
     
-    // Navigate to error page with state
-    // Note: Using replace prevents "back" button from returning to this failed state
-    navigate(errorRoute, {
-      state: navigationState,
-      replace: false // Keep in history so user can use back button
-    })
+    // Perform redirect
+    if (config.onRedirect) {
+      // Custom redirect handler
+      config.onRedirect(errorRoute, navigationState)
+    } else {
+      // Default navigation
+      navigate(errorRoute, {
+        state: navigationState,
+        replace: false,  // Keep in history for back button
+      })
+    }
   }, [
-    validationResult.state,
-    validationResult.isValidating,
-    validationResult.data,
-    config.activeOrder,
-    config.currentPath,
-    config.onValidationError,
+    validation.state.phase,
+    validation.state.validationState,
+    config.customerId,
+    config.onRedirect,
     navigate,
-    location.pathname
   ])
   
-  return {
-    ...validationResult,
-    isValidating: validationResult.isValidating,
-    state: validationResult.state,
-    isAllowed: validationResult.state === 'allowed'
-  }
+  // Return validation result as-is
+  return validation
 }
 
+// ============================================================================
+// ERROR PAGE HELPER
+// ============================================================================
+
 /**
- * Helper hook for error pages to handle "Try Again" functionality
+ * Helper hook for error pages to access validation state and navigation helpers
  * 
- * Usage in error pages:
- * ```tsx
- * const { customerId, handleTryAgain } = useErrorPageHelpers()
+ * @example
+ * const { state, handleRetry } = useErrorPageHelpers()
  * 
  * return (
- *   <button onClick={handleTryAgain}>
- *     Try Again
- *   </button>
+ *   <div>
+ *     <h1>{state?.error}</h1>
+ *     <button onClick={handleRetry}>Try Again</button>
+ *   </div>
  * )
- * ```
  */
 export function useErrorPageHelpers() {
   const navigate = useNavigate()
   const location = useLocation()
   const { customerId } = useParams<{ customerId: string }>()
   
-  // Get state passed from useValidationRedirect
-  const state = location.state as any
-  const validationState = state?.validationState
-  const activeOrder = state?.activeOrder
+  // Extract state passed from useValidationRedirect
+  const validationData = location.state as any
   
   /**
-   * Navigate back to customer home to retry validation
+   * Retry validation by navigating back to customer home
    */
-  const handleTryAgain = () => {
+  const handleRetry = () => {
     if (customerId) {
       navigate(`/${customerId}`)
     } else {
-      // Fallback for customer-not-found page (no customerId in URL)
+      // Fallback for pages without customerId in URL
       navigate('/')
     }
   }
   
   /**
-   * Navigate to order tracking page (for restaurant closed with active orders)
+   * Navigate to order tracking (for active orders)
    */
-  const handleTrackOrder = () => {
-    if (customerId && activeOrder?.id) {
-      navigate(`/${customerId}/order-status/${activeOrder.id}`)
+  const handleTrackOrder = (orderId: string) => {
+    if (customerId) {
+      navigate(`/${customerId}/order-status/${orderId}`)
     }
   }
   
   /**
-   * Navigate to order history page
+   * Navigate to order history
    */
   const handleViewHistory = () => {
     if (customerId) {
@@ -250,13 +232,9 @@ export function useErrorPageHelpers() {
   
   return {
     customerId,
-    validationState,
-    activeOrder,
-    restaurantStatus: state?.restaurantStatus,
-    geofencingData: state?.geofencingData,
-    customer: state?.customer,
-    handleTryAgain,
+    state: validationData,
+    handleRetry,
     handleTrackOrder,
-    handleViewHistory
+    handleViewHistory,
   }
 }

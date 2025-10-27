@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { WelcomePage } from './pages/WelcomePage'
+import { WelcomePage } from './pages/welcome'
 import { MenuPage } from './pages/MenuPage'
 import { CartPage } from './pages/CartPage'
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage'
@@ -73,15 +73,6 @@ function App() {
                 <Route path="/:customerId/error/no-geolocation-support" element={<NoGeolocationSupportPage />} />
                 <Route path="/:customerId/error/generic" element={<GenericErrorPage />} />
 
-                {/* Catch-all for invalid routes - show error */}
-                <Route path="/:customerId" element={<CustomerGuard><WelcomePage /></CustomerGuard>} />
-                <Route path="/:customerId/menu" element={<CustomerGuard><MenuPage /></CustomerGuard>} />
-                <Route path="/:customerId/cart" element={<CustomerGuard><CartPage /></CustomerGuard>} />
-                <Route path="/:customerId/order-confirmation" element={<CustomerGuard><OrderConfirmationPage /></CustomerGuard>} />
-                <Route path="/:customerId/payment-pending/:orderId" element={<CustomerGuard><PaymentPendingPage /></CustomerGuard>} />
-                <Route path="/:customerId/order-status/:orderId" element={<CustomerGuard><OrderStatusPage /></CustomerGuard>} />
-                <Route path="/:customerId/orders" element={<CustomerGuard><OrderHistoryPage /></CustomerGuard>} />
-                
                 {/* Catch-all for invalid routes - show error */}
                 <Route path="*" element={
                   <div className="h-screen flex flex-col bg-gradient-to-br from-fire-500 via-fire-600 to-ember-600 overflow-hidden p-6">

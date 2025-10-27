@@ -5,18 +5,18 @@
  * Uses navigator.geolocation.getCurrentPosition()
  */
 
-import type { ValidatorResult, LocationCoordinates, ValidatorOptions } from '../types'
+import type { ValidatorResult, LocationCoordinates, ValidatorOptions, ValidatorContext } from '../types'
 import { GEOLOCATION_OPTIONS } from '../constants'
 
 /**
  * Gather GPS coordinates from browser
  * 
- * @param _params - Not used
+ * @param _context - Not used (browser-based validation)
  * @param options - Validator options (timeout, highAccuracy)
  * @returns Validation result with coordinates
  */
 export async function validateGeoLocationGather(
-  _params: any,
+  _context: ValidatorContext,
   options?: ValidatorOptions
 ): Promise<ValidatorResult<LocationCoordinates>> {
   return new Promise((resolve) => {

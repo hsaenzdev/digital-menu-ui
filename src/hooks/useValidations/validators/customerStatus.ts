@@ -4,7 +4,7 @@
  * Validates that the customer account is not disabled
  */
 
-import type { ValidatorResult, ValidatorOptions } from '../types'
+import type { ValidatorResult, ValidatorOptions, ValidatorContext } from '../types'
 import { API_ENDPOINTS } from '../constants'
 import { 
   validationCache, 
@@ -16,14 +16,16 @@ import {
 /**
  * Validate customer is not disabled
  * 
- * @param customerId - Customer ID to validate
+ * @param context - Validator context (contains customerId)
  * @param options - Validator options
  * @returns Validation result
  */
 export async function validateCustomerStatus(
-  customerId: string,
+  context: ValidatorContext,
   options?: ValidatorOptions
 ): Promise<ValidatorResult<void>> {
+  const customerId = context.customerId
+
   // Check cache first (unless skipCache is true)
   if (!options?.skipCache) {
     const cacheKey = getCacheKeyCustomerStatus(customerId)

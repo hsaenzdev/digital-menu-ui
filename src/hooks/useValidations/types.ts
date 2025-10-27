@@ -207,3 +207,120 @@ export interface CacheEntry<T = any> {
 export interface CacheStore {
   [key: string]: CacheEntry
 }
+
+// ============================================================================
+// NEW REFACTORED HOOK TYPES (v2)
+// ============================================================================
+
+/**
+ * Validation type names
+ */
+export type ValidationType =
+  | 'customerExists'
+  | 'customerStatus'
+  | 'restaurantStatus'
+  | 'geoLocationSupport'
+  | 'geoLocationGather'
+  | 'geofencingValidate'
+
+/**
+ * Validation phase (lifecycle state)
+ */
+export type ValidationPhase = 'idle' | 'validating' | 'success' | 'failed'
+
+/**
+ * Single validation configuration item
+ */
+export interface ValidationItem {
+  name: ValidationType
+  enabled?: boolean  // Default: true
+}
+
+/**
+ * Hook configuration (v2)
+ */
+export interface UseValidationsConfig {
+  /** Array of validations to run (order = execution order) */
+  validations: ValidationItem[]
+  
+  /** Auto-run validation on mount (default: false) */
+  autoRun?: boolean
+  
+  /** Skip cache for all validators (default: false) */
+  skipCache?: boolean
+  
+  /** API timeout in milliseconds (default: 5000) */
+  apiTimeout?: number
+}
+
+/**
+ * Validation context passed to validators
+ */
+export interface ValidatorContext {
+  /** Customer ID from URL params */
+  customerId: string
+  
+  /** Accumulated data from previous validators */
+  data: Record<string, any>
+}
+
+/**
+ * Hook state (v2)
+ */
+export interface ValidationHookState {
+  /** Current phase of validation lifecycle */
+  phase: ValidationPhase
+  
+  /** Currently running validation step */
+  currentStep?: string
+  
+  /** Validation that failed (if any) */
+  failedStep?: string
+  
+  /** Successfully completed validations */
+  completedSteps: string[]
+  
+  /** The actual validation state (for routing) */
+  validationState?: ValidationState
+  
+  /** Error message if failed */
+  error?: string
+  
+  /** Accumulated data from all validators */
+  data: Record<string, any>
+}
+
+/**
+ * Hook return type (v2)
+ */
+export interface UseValidationsReturnV2 {
+  /** Current state */
+  state: ValidationHookState
+  
+  /** Accumulated data (alias for state.data) */
+  data: Record<string, any>
+  
+  /** Trigger validation manually */
+  validate: () => Promise<void>
+  
+  /** Reset to initial state */
+  reset: () => void
+  
+  /** Convenience: Is currently validating? */
+  isValidating: boolean
+  
+  /** Convenience: Did all validations pass? */
+  isSuccess: boolean
+  
+  /** Convenience: Did validation fail? */
+  isFailed: boolean
+}
+
+/**
+ * Validator function type (v2)
+ * Accepts context instead of direct params
+ */
+export type ValidatorFunctionV2<TData = any> = (
+  context: ValidatorContext,
+  options?: ValidatorOptions
+) => Promise<ValidatorResult<TData>>

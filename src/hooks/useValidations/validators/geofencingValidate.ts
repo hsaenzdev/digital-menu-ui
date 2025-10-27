@@ -4,7 +4,7 @@
  * Validates customer location is within city boundaries and delivery zone
  */
 
-import type { ValidatorResult, GeofencingData, LocationCoordinates, ValidatorOptions } from '../types'
+import type { ValidatorResult, GeofencingData, LocationCoordinates, ValidatorOptions, ValidatorContext } from '../types'
 import { API_ENDPOINTS } from '../constants'
 import { 
   validationCache, 
@@ -16,14 +16,25 @@ import {
 /**
  * Validate customer is within delivery zone
  * 
- * @param coordinates - GPS coordinates from geoLocationGather
+ * @param context - Validator context (expects geoLocationGather data)
  * @param options - Validator options
  * @returns Validation result with city/zone data
  */
 export async function validateGeofencingValidate(
-  coordinates: LocationCoordinates,
+  context: ValidatorContext,
   options?: ValidatorOptions
 ): Promise<ValidatorResult<GeofencingData>> {
+  // Extract GPS coordinates from accumulated data
+  const coordinates = context.data.geoLocationGather as LocationCoordinates | undefined
+  
+  if (!coordinates) {
+    return {
+      passed: false,
+      state: 'error',
+      error: 'GPS coordinates not available. Run geoLocationGather first.',
+    }
+  }
+
   const { latitude, longitude } = coordinates
 
   // Check cache first (unless skipCache is true)

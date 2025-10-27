@@ -5,17 +5,17 @@
  * This is a browser check, no API call needed
  */
 
-import type { ValidatorResult, ValidatorOptions } from '../types'
+import type { ValidatorResult, ValidatorOptions, ValidatorContext } from '../types'
 
 /**
  * Validate browser supports geolocation
  * 
- * @param _params - Not used
+ * @param _context - Not used
  * @param _options - Not used (no caching for browser checks)
  * @returns Validation result
  */
 export async function validateGeoLocationSupport(
-  _params: any,
+  _context: ValidatorContext,
   _options?: ValidatorOptions
 ): Promise<ValidatorResult<void>> {
   // Check if navigator.geolocation exists
